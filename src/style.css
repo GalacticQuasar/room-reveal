@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ink: #e7f0ff;
+  --ink-muted: #9bb2d4;
+  --accent: #6ce0c8;
+  --warning: #ff8e72;
+  --panel: rgba(9, 16, 32, 0.72);
+  --panel-border: rgba(108, 224, 200, 0.3);
+  --bg1: #06111f;
+  --bg2: #0e2446;
+  --bg3: #153667;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 84% 12%, rgba(108, 224, 200, 0.2), transparent 34%),
+    radial-gradient(circle at 13% 76%, rgba(255, 142, 114, 0.16), transparent 29%),
+    linear-gradient(140deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg3) 100%);
+}
+
+.viewer-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#viewport {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.hud {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: min(420px, calc(100vw - 2rem));
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+}
+
+.hud h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.3vw, 1.6rem);
+  letter-spacing: 0.02em;
+}
+
+.hint {
+  margin: 0.7rem 0 1rem;
+  color: var(--ink-muted);
+}
+
+.upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  background: rgba(108, 224, 200, 0.14);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 130ms ease, background-color 130ms ease;
+  font-weight: 600;
+}
+
+.upload:hover {
+  transform: translateY(-1px);
+  background: rgba(108, 224, 200, 0.24);
+}
+
+.upload input {
+  display: none;
+}
+
+#status {
+  margin: 0.9rem 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  color: var(--accent);
+}
+
+#status.error {
+  color: var(--warning);
+}
+
+.controls {
+  margin-top: 0.75rem;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
+.controls p {
+  margin: 0.35rem 0;
+}
+
+.toggle-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+  color: var(--ink);
+}
+
+.toggle-row input {
+  accent-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .hud {
+    top: auto;
+    bottom: 0.7rem;
+    left: 0.7rem;
+    right: 0.7rem;
+    width: auto;
+    padding: 0.9rem;
+  }
+}
