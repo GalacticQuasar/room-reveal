@@ -1,6 +1,7 @@
 import './style.css'
 import * as THREE from 'three'
 import { SplatFileType, SplatMesh } from '@sparkjsdev/spark'
+import startPositions from './start-positions.json'
 
 const app = document.querySelector('#app')
 app.innerHTML = `
@@ -13,6 +14,7 @@ app.innerHTML = `
         <input id="plyInput" type="file" accept=".ply" />
         <span>Load PLY</span>
       </label>
+      <button id="logCoordsBtn" class="secondary-btn" type="button" disabled>Log current position</button>
       <p id="status">Waiting for file...</p>
       <div class="controls">
         <p><strong>Move:</strong> W A S D</p>
@@ -33,6 +35,7 @@ const canvas = document.querySelector('#viewport')
 const input = document.querySelector('#plyInput')
 const status = document.querySelector('#status')
 const rotateToggle = document.querySelector('#rotateToggle')
+const logCoordsBtn = document.querySelector('#logCoordsBtn')
 
 const scene = new THREE.Scene()
 scene.fog = new THREE.Fog(0x0a111f, 22, 140)
@@ -52,6 +55,7 @@ grid.position.y = -2
 scene.add(grid)
 
 let activeSplat = null
+let activeFileName = ''
 const keyState = {}
 const euler = new THREE.Euler(0, 0, 0, 'YXZ')
 const worldUp = new THREE.Vector3(0, 1, 0)
@@ -75,6 +79,36 @@ function setStatus(message, isError = false) {
   status.classList.toggle('error', isError)
 }
 
+function getHardcodedStartPosition(fileName) {
+  if (!fileName) return null
+
+  const exact = startPositions[fileName]
+  if (exact) return exact
+
+  const lowerName = fileName.toLowerCase()
+  for (const [key, coords] of Object.entries(startPositions)) {
+    if (key.toLowerCase() === lowerName) {
+      return coords
+    }
+  }
+
+  return null
+}
+
+function formatCoord(value) {
+  return Number(value.toFixed(4))
+}
+
+function buildPositionJsonEntry(fileName, position) {
+  const coords = {
+    x: formatCoord(position.x),
+    y: formatCoord(position.y),
+    z: formatCoord(position.z),
+  }
+
+  return `"${fileName}": ${JSON.stringify(coords)}`
+}
+
 async function loadPlyFile(file) {
   try {
     setStatus(`Loading ${file.name}...`)
@@ -84,6 +118,8 @@ async function loadPlyFile(file) {
       activeSplat.dispose()
       activeSplat = null
     }
+    activeFileName = ''
+    logCoordsBtn.disabled = true
 
     const fileBytes = new Uint8Array(await file.arrayBuffer())
     const splat = new SplatMesh({
@@ -100,10 +136,22 @@ async function loadPlyFile(file) {
 
     const bounds = splat.getBoundingBox(true)
     const center = bounds.getCenter(new THREE.Vector3())
-    const size = Math.max(bounds.getSize(new THREE.Vector3()).length(), 1)
+    const hardcodedStart = getHardcodedStartPosition(file.name)
 
-    camera.position.copy(center).add(new THREE.Vector3(0, size * 0.18, size * 0.55))
-    camera.lookAt(center)
+    if (
+      hardcodedStart &&
+      Number.isFinite(hardcodedStart.x) &&
+      Number.isFinite(hardcodedStart.y) &&
+      Number.isFinite(hardcodedStart.z)
+    ) {
+      camera.position.set(hardcodedStart.x, hardcodedStart.y, hardcodedStart.z)
+      camera.lookAt(center)
+    } else {
+      camera.position.copy(center)
+    }
+
+    activeFileName = file.name
+    logCoordsBtn.disabled = false
     setStatus(`Loaded ${file.name}. Click inside the scene to lock pointer and fly.`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error while loading file'
@@ -121,6 +169,23 @@ input.addEventListener('change', (event) => {
 rotateToggle.addEventListener('change', (event) => {
   useRotationCorrection = event.target.checked
   applySplatOrientation(activeSplat)
+})
+
+logCoordsBtn.addEventListener('click', async () => {
+  if (!activeSplat || !activeFileName) {
+    setStatus('Load a file before logging coordinates.', true)
+    return
+  }
+
+  const entry = buildPositionJsonEntry(activeFileName, camera.position)
+  console.log('[START_POSITION_ENTRY]', entry)
+
+  try {
+    await navigator.clipboard.writeText(entry)
+    setStatus(`Logged start position for ${activeFileName}. Copied entry to clipboard.`)
+  } catch {
+    setStatus(`Logged start position for ${activeFileName}. Check the console output.`)
+  }
 })
 
 window.addEventListener('dragover', (event) => {
