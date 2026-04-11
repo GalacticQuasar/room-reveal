@@ -146,18 +146,6 @@ body {
   margin: 0.35rem 0;
 }
 
-.toggle-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.55rem;
-  color: var(--ink);
-}
-
-.toggle-row input {
-  accent-color: var(--accent);
-}
-
 @media (max-width: 700px) {
   .hud {
     top: auto;

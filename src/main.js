@@ -22,10 +22,6 @@ app.innerHTML = `
         <p><strong>Boost:</strong> Shift</p>
         <p><strong>Mouse look:</strong> Pointer lock</p>
         <p><strong>Unlock:</strong> Esc</p>
-        <label class="toggle-row">
-          <input id="rotateToggle" type="checkbox" />
-          <span>Apply 180deg rotation correction</span>
-        </label>
       </div>
     </aside>
   </div>
@@ -34,7 +30,6 @@ app.innerHTML = `
 const canvas = document.querySelector('#viewport')
 const input = document.querySelector('#plyInput')
 const status = document.querySelector('#status')
-const rotateToggle = document.querySelector('#rotateToggle')
 const logCoordsBtn = document.querySelector('#logCoordsBtn')
 
 const scene = new THREE.Scene()
@@ -67,11 +62,10 @@ const clock = new THREE.Clock()
 const lookSensitivity = 0.0018
 const baseSpeed = 8
 const boostMultiplier = 2.4
-let useRotationCorrection = false
 
 function applySplatOrientation(splat) {
   if (!splat) return
-  splat.rotation.x = useRotationCorrection ? -Math.PI : 0
+  splat.rotation.x = -Math.PI
 }
 
 function setStatus(message, isError = false) {
@@ -164,11 +158,6 @@ input.addEventListener('change', (event) => {
   if (file) {
     void loadPlyFile(file)
   }
-})
-
-rotateToggle.addEventListener('change', (event) => {
-  useRotationCorrection = event.target.checked
-  applySplatOrientation(activeSplat)
 })
 
 logCoordsBtn.addEventListener('click', async () => {
