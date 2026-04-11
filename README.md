@@ -31,3 +31,4 @@ Open the local URL from Vite, then:
 - `Mouse`: look around (pointer lock)
 - `Esc`: release pointer lock
 # room-reveal
+# room-reveal
