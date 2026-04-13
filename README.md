@@ -11,7 +11,9 @@ Room Reveal helps students explore living spaces in dorms or apartments around c
 ## Technologies
 
 - Nerfstudio: for the 3D reconstruction pipeline to create Gaussian Splat models from videos
-- React Three Fiber: for the interactive 3D visualization of the models on the frontend
+- Three.js + `@sparkjsdev/spark`: for interactive Gaussian splat visualization in the browser
+- MapLibre GL: for the map-based landing page with 3D building extrusion
+- Vite: for local development and production builds
 - Docker: for containerization of the Nerfstudio pipeline to ensure consistent environments and easy setup
 
 ## How It Works

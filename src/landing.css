@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --ink: #e7f0ff;
+  --ink-muted: #9bb2d4;
+  --accent: #6ce0c8;
+  --warning: #ff8e72;
+  --panel: rgba(9, 16, 32, 0.72);
+  --panel-border: rgba(108, 224, 200, 0.3);
+  --bg1: #06111f;
+  --bg2: #0e2446;
+  --bg3: #153667;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+#landing-page {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+}
+
+#map-container {
+  width: 100%;
+  height: 100%;
+}
+
+#map-container .maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+.landing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.landing-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.landing-title .accent {
+  color: var(--accent);
+}
+
+.launch-btn {
+  pointer-events: auto;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  background: #fff;
+  color: #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.launch-btn:hover {
+  transform: translateY(-1px);
+  background: #e0e0e0;
+}
+
+.launch-btn:active {
+  transform: translateY(0);
+  background: #ccc;
+}
+
+.landing-hint {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #fff;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  padding: 0 1.5rem 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .landing-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .landing-title {
+    font-size: 1.25rem;
+  }
+
+  .launch-btn {
+    width: 100%;
+  }
+}
