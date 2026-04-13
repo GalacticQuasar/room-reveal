@@ -1,6 +1,8 @@
 # Room Reveal
 
-![Room Reveal Logo](room-reveal-logo.png)
+![Room Reveal Logo](public/room-reveal-logo.png)
+
+> Note: This project won at the 2026 Claude Hackathon hosted by Claude Builder Club at Purdue University! 🎉
 
 Room Reveal is a platform where students can explore 3D Gaussian Splat models of various living spaces around campus. Models are created when users upload a video of their rooms (after specifying their location and room type) that is transformed into a Gaussian Splat 3D model by our processing pipeline. From there, any user can explore the space interactively on our website to get a sense of potential future living spaces.
 
