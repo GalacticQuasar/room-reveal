@@ -22,6 +22,7 @@ This document is a technical handoff for engineers and coding agents working on 
 - `src/main.js`: Three.js + Spark viewer logic, controls, file loading, and status UI.
 - `src/style.css`: viewer styles and shared visual tokens used by viewer UI.
 - `src/start-positions.json`: filename -> start camera coordinate mapping.
+- `STYLE.md`: typography and color tokens for UI styling.
 - `pipeline/README.md`: Nerfstudio/COLMAP offline processing workflow for generating `.ply` files.
 
 ## 3) Runtime architecture
