@@ -7,7 +7,7 @@ app.innerHTML = `
     <div id="map-container"></div>
     <div class="landing-overlay">
       <header class="landing-header">
-        <h1 class="landing-title">Room <span class="accent">Reveal</span></h1>
+        <h1 class="landing-title"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
         <button id="launch-viewer" class="launch-btn" type="button">Launch Viewer</button>
       </header>
       <p class="landing-hint">Explore Purdue campus in 3D. Select a building to view its rooms.</p>

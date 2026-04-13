@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
 :root {
-  --ink: #e7f0ff;
-  --ink-muted: #9bb2d4;
-  --accent: #6ce0c8;
-  --warning: #ff8e72;
-  --panel: rgba(9, 16, 32, 0.72);
-  --panel-border: rgba(108, 224, 200, 0.3);
-  --bg1: #06111f;
-  --bg2: #0e2446;
-  --bg3: #153667;
+  --content: #f1f0f0;
+  --content-muted: rgba(241, 240, 240, 0.6);
+  --primary: #456990;
+  --accent: #fa6559;
+  --panel: rgba(20, 20, 20, 0.85);
+  --panel-border: rgba(69, 105, 144, 0.4);
+  --bg1: #141414;
+  --bg2: #1e1e1e;
+  --bg3: #456990;
 }
 
 * {
@@ -28,7 +28,7 @@ body,
 
 body {
   font-family: 'Space Grotesk', sans-serif;
-  color: var(--ink);
+  color: var(--content);
   overflow: hidden;
 }
 
@@ -69,10 +69,15 @@ body {
 
 .landing-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #fff;
+  font-family: 'Cardo', serif;
+}
+
+.landing-title .primary {
+  color: var(--primary);
 }
 
 .landing-title .accent {
@@ -84,8 +89,8 @@ body {
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.5rem;
-  background: #fff;
-  color: #000;
+  background: var(--primary);
+  color: var(--content);
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
@@ -95,12 +100,12 @@ body {
 
 .launch-btn:hover {
   transform: translateY(-1px);
-  background: #e0e0e0;
+  background: #3a5779;
 }
 
 .launch-btn:active {
   transform: translateY(0);
-  background: #ccc;
+  background: #2f4a68;
 }
 
 .landing-hint {
