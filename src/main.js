@@ -142,8 +142,7 @@ async function loadPlyFile(file) {
     scene.add(splat)
     activeSplat = splat
 
-    const bounds = splat.getBoundingBox(true)
-    const center = bounds.getCenter(new THREE.Vector3())
+    const center = new THREE.Vector3(0, 0, 0)
     const hardcodedStart = getHardcodedStartPosition(file.name)
 
     if (
