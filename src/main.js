@@ -14,6 +14,10 @@ app.innerHTML = `
         <input id="plyInput" type="file" accept=".ply" />
         <span>Load PLY</span>
       </label>
+      <label class="toggle">
+        <input id="flip90Toggle" type="checkbox" />
+        <span>Flip 90° (Nerfstudio)</span>
+      </label>
       <button id="logCoordsBtn" class="secondary-btn" type="button" disabled>Log current position</button>
       <p id="status">Waiting for file...</p>
       <div class="controls">
@@ -31,6 +35,7 @@ const canvas = document.querySelector('#viewport')
 const input = document.querySelector('#plyInput')
 const status = document.querySelector('#status')
 const logCoordsBtn = document.querySelector('#logCoordsBtn')
+const flip90Toggle = document.querySelector('#flip90Toggle')
 
 const scene = new THREE.Scene()
 scene.fog = new THREE.Fog(0x0a111f, 22, 140)
@@ -61,12 +66,21 @@ const clock = new THREE.Clock()
 
 const lookSensitivity = 0.0018
 const baseSpeed = 8
-const boostMultiplier = 2.4
+const boostMultiplier = 0.15
 
 function applySplatOrientation(splat) {
   if (!splat) return
-  splat.rotation.x = -Math.PI
+  splat.rotation.x = flip90Toggle.checked ? -Math.PI / 2 : 0
+  splat.rotation.z = flip90Toggle.checked ? Math.PI : 0
 }
+
+function reapplyOrientation() {
+  if (activeSplat) {
+    applySplatOrientation(activeSplat)
+  }
+}
+
+flip90Toggle.addEventListener('change', reapplyOrientation)
 
 function setStatus(message, isError = false) {
   status.textContent = message
