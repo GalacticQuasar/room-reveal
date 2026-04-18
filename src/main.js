@@ -65,8 +65,8 @@ const lookRight = new THREE.Vector3()
 const clock = new THREE.Clock()
 
 const lookSensitivity = 0.0018
-const baseSpeed = 8
-const boostMultiplier = 0.15
+const baseSpeed = 1
+const boostMultiplier = 2
 
 function applySplatOrientation(splat) {
   if (!splat) return
