@@ -11,6 +11,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
+        landingDev: './landing-dev.html',
         viewer: './viewer.html',
         upload: './upload.html',
         select: './select.html',

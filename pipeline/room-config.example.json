@@ -28,23 +28,23 @@
       "Standard Double w/bath & AC",
       "Standard Double w/AC"
     ],
-    "latitude": 40.4255,
-    "longitude": -86.9255
+    "latitude": 40.4257267,
+    "longitude": -86.9274028
   },
   "first-street-towers": {
     "room-types": [
       "Single w/private bath & AC"
     ],
     "latitude": 40.4249186,
-    "longitude": -86.9245489
+    "longitude": -86.9271238
   },
   "frieda-parker": {
     "room-types": [
       "Suite semi w/shared bath AC",
       "Suite w/shared bath AC"
     ],
-    "latitude": 40.428,
-    "longitude": -86.92
+    "latitude": 40.428475,
+    "longitude": -86.9221099
   },
   "winifred-parker": {
     "room-types": [
@@ -52,8 +52,8 @@
       "Suite semi w/shared bath AC",
       "Suite w/shared bath AC"
     ],
-    "latitude": 40.4283,
-    "longitude": -86.9195
+    "latitude": 40.4278412,
+    "longitude": -86.9227301
   },
   "harrison": {
     "room-types": [
@@ -64,7 +64,7 @@
       "Standard Double w/AC"
     ],
     "latitude": 40.4248226,
-    "longitude": -86.9266029
+    "longitude": -86.9291778
   },
   "hawkins": {
     "room-types": [
@@ -77,8 +77,8 @@
       "Single w/shower & AC",
       "Single w/shower bath & AC"
     ],
-    "latitude": 40.4239,
-    "longitude": -86.9225
+    "latitude": 40.422841,
+    "longitude": -86.9116301
   },
   "hillenbrand": {
     "room-types": [
@@ -86,8 +86,8 @@
       "Double w/shared bath & AC",
       "Single w/shared bath & AC"
     ],
-    "latitude": 40.4268796,
-    "longitude": -86.9264344
+    "latitude": 40.4267087,
+    "longitude": -86.9272373
   },
   "honors-college": {
     "room-types": [
@@ -96,8 +96,8 @@
       "Double w/AC",
       "Single w/AC"
     ],
-    "latitude": 40.4275,
-    "longitude": -86.9185
+    "latitude": 40.4269054,
+    "longitude": -86.9206475
   },
   "mccutcheon": {
     "room-types": [
@@ -108,8 +108,8 @@
       "Standard Double w/bath & AC",
       "Standard Double w/AC"
     ],
-    "latitude": 40.4246695,
-    "longitude": -86.9280938
+    "latitude": 40.4250276,
+    "longitude": -86.9286613
   },
   "meredith": {
     "room-types": [
@@ -121,7 +121,7 @@
       "Standard Single"
     ],
     "latitude": 40.4263027,
-    "longitude": -86.9232639
+    "longitude": -86.9258388
   },
   "meredith-south": {
     "room-types": [
@@ -130,8 +130,8 @@
       "Single w/AC",
       "Single w/private bath & AC"
     ],
-    "latitude": 40.4259,
-    "longitude": -86.9238
+    "latitude": 40.425433,
+    "longitude": -86.9235653
   },
   "owen": {
     "room-types": [
@@ -144,7 +144,7 @@
       "Single w/bath"
     ],
     "latitude": 40.4322429,
-    "longitude": -86.9207113
+    "longitude": -86.9232862
   },
   "shreve": {
     "room-types": [
@@ -152,13 +152,8 @@
       "Standard Double w/bath & AC",
       "Standard Double w/AC"
     ],
-    "latitude": 40.4269878,
-    "longitude": -86.9246771
-  },
-  "south-hall": {
-    "room-types": [],
-    "latitude": 40.4245,
-    "longitude": -86.922
+    "latitude": 40.426865,
+    "longitude": -86.9254069
   },
   "tarkington": {
     "room-types": [
@@ -169,7 +164,7 @@
       "Single w/bath"
     ],
     "latitude": 40.43082,
-    "longitude": -86.920727
+    "longitude": -86.9233019
   },
   "wiley": {
     "room-types": [
@@ -181,7 +176,7 @@
       "Single w/AC"
     ],
     "latitude": 40.4294753,
-    "longitude": -86.9207055
+    "longitude": -86.9232804
   },
   "windsor": {
     "room-types": [
@@ -199,7 +194,7 @@
       "Single w/shared bath & AC",
       "Single w/private bath & AC"
     ],
-    "latitude": 40.4267,
-    "longitude": -86.9226
+    "latitude": 40.426780,
+    "longitude": -86.921001
   }
 }

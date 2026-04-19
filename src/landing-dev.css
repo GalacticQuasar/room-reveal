@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #141414;
+  --content: #f1f0f0;
+  --content-muted: rgba(241, 240, 240, 0.64);
+  --primary: #456990;
+  --accent: #fa6559;
+  --surface-1: rgba(20, 20, 20, 0.84);
+  --surface-2: rgba(241, 240, 240, 0.12);
+  --surface-3: rgba(241, 240, 240, 0.22);
+  --good: #8ad18a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--content);
+  overflow: hidden;
+  background: radial-gradient(circle at 15% 20%, rgba(69, 105, 144, 0.2), transparent 36%),
+    radial-gradient(circle at 85% 85%, rgba(250, 101, 89, 0.14), transparent 30%), var(--bg);
+}
+
+#dev-page {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#map-container {
+  width: 100%;
+  height: 100%;
+}
+
+#map-container .maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+.dev-panel-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(430px, 100%);
+  height: 100%;
+  padding: 1rem;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.dev-panel {
+  height: 100%;
+  border: 1px solid var(--surface-2);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.87), rgba(20, 20, 20, 0.96));
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.panel-logo {
+  margin: 0;
+  font-family: 'Cardo', serif;
+  font-size: 1.8rem;
+  letter-spacing: -0.01em;
+}
+
+.panel-logo .primary {
+  color: var(--primary);
+}
+
+.panel-logo .accent {
+  color: var(--accent);
+}
+
+.subhead {
+  margin: 0;
+  color: var(--content-muted);
+  font-size: 0.85rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.input-group label {
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--content-muted);
+  font-weight: 600;
+}
+
+.select-control,
+.number-readout,
+.status-box,
+button {
+  font-family: 'Inter', sans-serif;
+}
+
+.select-control {
+  border-radius: 10px;
+  border: 1px solid var(--surface-2);
+  background: rgba(241, 240, 240, 0.06);
+  color: var(--content);
+  padding: 0.6rem;
+  font-size: 0.92rem;
+}
+
+.slider-wrap {
+  border: 1px solid var(--surface-2);
+  background: rgba(241, 240, 240, 0.04);
+  border-radius: 12px;
+  padding: 0.55rem 0.65rem;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.4rem;
+}
+
+.slider-row input[type='range'] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.slider-caption {
+  font-size: 0.8rem;
+  color: var(--content-muted);
+}
+
+.number-readout {
+  font-size: 0.84rem;
+  color: var(--content);
+  min-width: 70px;
+  text-align: right;
+}
+
+.coord-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.55rem;
+  font-size: 0.86rem;
+}
+
+.coord-label {
+  color: var(--content-muted);
+}
+
+.coord-value {
+  color: var(--content);
+  font-variant-numeric: tabular-nums;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+button {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  padding: 0.62rem 0.72rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: transform 120ms ease, filter 120ms ease, border-color 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--content);
+}
+
+.btn-ghost {
+  background: rgba(241, 240, 240, 0.06);
+  border-color: var(--surface-2);
+  color: var(--content);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: #141414;
+}
+
+.status-box {
+  border: 1px solid rgba(138, 209, 138, 0.4);
+  background: rgba(138, 209, 138, 0.12);
+  color: var(--good);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.65rem;
+  min-height: 2.3rem;
+}
+
+@media (max-width: 700px) {
+  .dev-panel-frame {
+    width: 100%;
+    height: auto;
+    max-height: 64vh;
+    top: auto;
+    bottom: 0;
+    padding: 0.65rem;
+  }
+
+  .dev-panel {
+    border-radius: 18px 18px 0 0;
+  }
+}
