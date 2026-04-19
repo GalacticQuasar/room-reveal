@@ -7,106 +7,106 @@
       "Double",
       "Double Large",
       "Double 2 rooms",
-      "Triple w/bath",
-      "Triple/Suite w/bath & AC",
-      "Small Double shared bath w/AC",
-      "Double w/shared bath & AC",
+      "Triple + bath",
+      "Triple or Suite + bath & AC",
+      "Small Double shared bath + AC",
+      "Double + shared bath & AC",
       "Small Single",
-      "Double w/private bath & AC",
-      "Large Double shared bath w/AC",
-      "Large Double private bath w/AC",
+      "Double + private bath & AC",
+      "Large Double shared bath + AC",
+      "Large Double private bath + AC",
       "Standard Single",
-      "Single w/shared bath & AC",
-      "Single w/private bath & AC"
+      "Single + shared bath & AC",
+      "Single + private bath & AC"
     ],
     "latitude": 40.4320142,
     "longitude": -86.9179111
   },
   "earhart": {
     "room-types": [
-      "Small Double w/AC",
-      "Standard Double w/bath & AC",
-      "Standard Double w/AC"
+      "Small Double + AC",
+      "Standard Double + bath & AC",
+      "Standard Double + AC"
     ],
     "latitude": 40.4255,
     "longitude": -86.9255
   },
   "first-street-towers": {
     "room-types": [
-      "Single w/private bath & AC"
+      "Single + private bath & AC"
     ],
     "latitude": 40.4249186,
     "longitude": -86.9245489
   },
   "frieda-parker": {
     "room-types": [
-      "Suite semi w/shared bath AC",
-      "Suite w/shared bath AC"
+      "Suite semi + shared bath AC",
+      "Suite + shared bath AC"
     ],
     "latitude": 40.428,
     "longitude": -86.92
   },
   "winifred-parker": {
     "room-types": [
-      "Suite for 6 w/bath AC",
-      "Suite semi w/shared bath AC",
-      "Suite w/shared bath AC"
+      "Suite for 6 + bath AC",
+      "Suite semi + shared bath AC",
+      "Suite + shared bath AC"
     ],
     "latitude": 40.4283,
     "longitude": -86.9195
   },
   "harrison": {
     "room-types": [
-      "Quad Converted w/AC",
-      "Triple w/AC",
-      "Quad w/AC",
-      "Triple w/bath & AC",
-      "Standard Double w/AC"
+      "Quad Converted + AC",
+      "Triple + AC",
+      "Quad + AC",
+      "Triple + bath & AC",
+      "Standard Double + AC"
     ],
     "latitude": 40.4248226,
     "longitude": -86.9266029
   },
   "hawkins": {
     "room-types": [
-      "Double w/AC",
-      "Double w/shared bath & AC",
-      "Single w/AC",
-      "Small Single w/AC",
-      "Single w/bath & AC",
-      "Single w/private bath & AC",
-      "Single w/shower & AC",
-      "Single w/shower bath & AC"
+      "Double + AC",
+      "Double + shared bath & AC",
+      "Single + AC",
+      "Small Single + AC",
+      "Single + bath & AC",
+      "Single + private bath & AC",
+      "Single + shower & AC",
+      "Single + shower bath & AC"
     ],
     "latitude": 40.4239,
     "longitude": -86.9225
   },
   "hillenbrand": {
     "room-types": [
-      "Small Double shared bath w/AC",
-      "Double w/shared bath & AC",
-      "Single w/shared bath & AC"
+      "Small Double shared bath + AC",
+      "Double + shared bath & AC",
+      "Single + shared bath & AC"
     ],
     "latitude": 40.4268796,
     "longitude": -86.9264344
   },
   "honors-college": {
     "room-types": [
-      "Quad w/AC",
-      "Triple w/AC",
-      "Double w/AC",
-      "Single w/AC"
+      "Quad + AC",
+      "Triple + AC",
+      "Double + AC",
+      "Single + AC"
     ],
     "latitude": 40.4275,
     "longitude": -86.9185
   },
   "mccutcheon": {
     "room-types": [
-      "Quad Converted w/AC",
-      "Triple w/AC",
-      "Quad w/AC",
-      "Triple w/bath & AC",
-      "Standard Double w/bath & AC",
-      "Standard Double w/AC"
+      "Quad Converted + AC",
+      "Triple + AC",
+      "Quad + AC",
+      "Triple + bath & AC",
+      "Standard Double + bath & AC",
+      "Standard Double + AC"
     ],
     "latitude": 40.4246695,
     "longitude": -86.9280938
@@ -114,10 +114,10 @@
   "meredith": {
     "room-types": [
       "Double",
-      "Double w/bath",
-      "Quad w/AC",
+      "Double + bath",
+      "Quad + AC",
       "Small Single",
-      "2 Room Suite for 2 w/bath",
+      "2 Room Suite for 2 + bath",
       "Standard Single"
     ],
     "latitude": 40.4263027,
@@ -125,10 +125,10 @@
   },
   "meredith-south": {
     "room-types": [
-      "Quad w/AC",
-      "Double w/AC",
-      "Single w/AC",
-      "Single w/private bath & AC"
+      "Quad + AC",
+      "Double + AC",
+      "Single + AC",
+      "Single + private bath & AC"
     ],
     "latitude": 40.4259,
     "longitude": -86.9238
@@ -138,19 +138,19 @@
       "Quad",
       "Triple",
       "Standard Double",
-      "Triple w/bath",
-      "Triple w/AC",
-      "Single w/AC",
-      "Single w/bath"
+      "Triple + bath",
+      "Triple + AC",
+      "Single + AC",
+      "Single + bath"
     ],
     "latitude": 40.4322429,
     "longitude": -86.9207113
   },
   "shreve": {
     "room-types": [
-      "Small Double w/AC",
-      "Standard Double w/bath & AC",
-      "Standard Double w/AC"
+      "Small Double + AC",
+      "Standard Double + bath & AC",
+      "Standard Double + AC"
     ],
     "latitude": 40.4269878,
     "longitude": -86.9246771
@@ -158,10 +158,10 @@
   "tarkington": {
     "room-types": [
       "Triple",
-      "Quad w/AC",
+      "Quad + AC",
       "Standard Double",
-      "Triple w/bath",
-      "Single w/bath"
+      "Triple + bath",
+      "Single + bath"
     ],
     "latitude": 40.43082,
     "longitude": -86.920727
@@ -171,28 +171,28 @@
       "Quad",
       "Triple",
       "Standard Double",
-      "Triple w/bath",
-      "Single w/bath",
-      "Single w/AC"
+      "Triple + bath",
+      "Single + bath",
+      "Single + AC"
     ],
     "latitude": 40.4294753,
     "longitude": -86.9207055
   },
   "windsor": {
     "room-types": [
-      "Small Double w/AC",
-      "Triple w/AC",
-      "Double w/AC",
-      "Double w/private bath & AC",
-      "Triple w/shared bath & AC",
-      "Triple w/private bath & AC",
+      "Small Double + AC",
+      "Triple + AC",
+      "Double + AC",
+      "Double + private bath & AC",
+      "Triple + shared bath & AC",
+      "Triple + private bath & AC",
       "2 Room Suite for 4 private bath AC",
-      "Double w/shared bath & AC",
-      "Large Double w/AC",
-      "Single w/AC",
-      "Single w/private half bath & AC",
-      "Single w/shared bath & AC",
-      "Single w/private bath & AC"
+      "Double + shared bath & AC",
+      "Large Double + AC",
+      "Single + AC",
+      "Single + private half bath & AC",
+      "Single + shared bath & AC",
+      "Single + private bath & AC"
     ],
     "latitude": 40.4267,
     "longitude": -86.9226
