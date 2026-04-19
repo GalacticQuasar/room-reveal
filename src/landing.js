@@ -46,7 +46,7 @@ app.innerHTML = `
     <div id="map-container"></div>
     <div class="panel-frame">
       <aside class="left-panel" aria-label="Residence and room type selector">
-        <h1 class="panel-logo"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
+        <a href="/" style="text-decoration: none;"><h1 class="panel-logo"><span class="primary">Room</span> <span class="accent">Reveal</span></h1></a>
 
         <div class="selection-stage">
           <p class="stage-label">Select Residence</p>

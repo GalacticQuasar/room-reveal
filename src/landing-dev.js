@@ -14,7 +14,7 @@ app.innerHTML = `
     <div id="map-container"></div>
     <div class="dev-panel-frame">
       <aside class="dev-panel">
-        <h1 class="panel-logo"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
+        <a href="/" style="text-decoration: none;"><h1 class="panel-logo"><span class="primary">Room</span> <span class="accent">Reveal</span></h1></a>
         <p class="subhead">Landing dev tools for coordinate tuning</p>
 
         <div class="input-group">
