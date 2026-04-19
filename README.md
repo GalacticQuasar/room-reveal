@@ -10,38 +10,101 @@ Room Reveal is a platform where students can explore 3D Gaussian Splat models of
 
 Room Reveal helps students explore living spaces in dorms or apartments around campus, helping them plan ahead for how to effectively use space, what to buy, or what accommodations they may need. This is especially useful for those with disabilities or accessibility needs, as they can get a better sense of the space before moving in. Different room configurations such as lofted beds, double vs triple occupancy within the same room type, and possibilities for furniture arrangement can be better visualized through our platform. The need for this project was inspired by the fact that currently, Purdue only provides a top-down floor plan of most dorm rooms without any pictures or videos. The floor plan leaves out important details such as the location of furnishings and actually usable space. We aim to provide a more immersive and informative way for students to explore their future living spaces before moving in.
 
-## Technologies
+## What it does
 
-- Nerfstudio: for the 3D reconstruction pipeline to create Gaussian Splat models from videos
-- Three.js + `@sparkjsdev/spark`: for interactive Gaussian splat visualization in the browser
-- MapLibre GL: for the map-based landing page with 3D building extrusion
-- Vite: for local development and production builds
-- Docker: for containerization of the Nerfstudio pipeline to ensure consistent environments and easy setup
+- Browse Purdue residences on a 3D map and choose room types
+- Upload room videos (max 5 minutes) to generate new splats
+- View available scans for a building/room type in an interactive viewer
+- Navigate multiple scans for the same room type with left/right controls
 
-## How It Works
+## Tech stack
 
-The process of creating a Gaussian Splat model from a video involves several steps:
-1. **Data Collection**: The user uploads a video of their room, which can be taken with a phone camera. The video should capture the entire living space from multiple angles to ensure good coverage for 3D reconstruction.
-2. **COLMAP Processing**: The video frames are extracted and processed with COLMAP, a structure-from-motion software, to extract camera poses and a sparse point cloud of the scene.
-3. **Gaussian Splatting**: The extracted data from COLMAP is then used to train a Gaussian Splatting model using Nerfstudio, which creates a 3D representation of the scene in the form of Gaussian splats.
-4. **Visualization**: The resulting Gaussian Splat model is then made available on the Room Reveal website, where users can interactively explore the 3D scene to get a better sense of the living space.
+- Frontend: Vite + vanilla JS
+- 3D viewer: Three.js + `@sparkjsdev/spark`
+- Map UI: MapLibre GL
+- Backend API + jobs: FastAPI on Modal
+- Gaussian Splatting pipeline: Nerfstudio (`ns-process-data`, `ns-train`, `ns-export`) container run on Modal
 
-## Run Gaussian Splatting Pipeline
+## Project structure
 
-Follow the instructions in the [Gaussian Splatting Pipeline README](pipeline/README.md) to set up and run the pipeline to create Gaussian Splat models from videos of rooms.
+- `src/landing.js`: main landing page (`/`) with map, selectors, upload modal, and viewer routing
+- `src/main.js`: viewer page (`/viewer.html`) for loading and navigating splats
+- `src/upload.js`: standalone upload page (`/upload.html`)
+- `src/select.js`: standalone selector page (`/select.html`)
+- `src/landing-dev.js`: coordinate tuning tool (`/landing-dev.html`)
+- `src/api.js`: frontend API URL helper using `VITE_MODAL_ENDPOINT`
+- `src/room-config.json`: configuration file for buildings + room types + map coordinates
+- `modal_app.py`: Modal/FastAPI backend (`/upload`, `/splats/...`) and GPU pipeline job orchestration
+- `pipeline/pipeline.sh`: script executed in Modal GPU jobs to produce `splat.ply`
 
-## Run Gaussian Splat Visualization locally
+## Frontend routes
+
+- `/` -> landing experience (`src/landing.js`)
+- `/viewer.html?building=...&room_type=...&splat_id=...` -> splat viewer
+- `/upload.html` -> standalone upload form
+- `/select.html` -> standalone selector for building/room/splat
+- `/landing-dev.html` -> internal dev tool for coordinate tuning
+
+## Local development (frontend)
+
+### 1) Install dependencies
 
 ```bash
 npm install
+```
+
+### 2) Configure backend endpoint
+
+Create a local `.env` from `.env.example` and set:
+
+```bash
+VITE_MODAL_ENDPOINT="https://your-modal-app.modal.run"
+```
+
+If `VITE_MODAL_ENDPOINT` is not set, the frontend falls back to relative API paths and requests will only work if an API is served from the same origin.
+
+### 3) Start dev server
+
+```bash
 npm run dev
 ```
 
-### Controls
+### 4) Build for production
+
+```bash
+npm run build
+npm run preview
+```
+
+## Backend overview (Modal + FastAPI)
+
+Defined in `modal_app.py`:
+
+- `GET /splats/{building}/{room_type}`: list available splats
+- `GET /splats/{building}/{room_type}/{file_name}`: fetch `.ply` file
+- `POST /upload`: upload a room video and enqueue processing
+
+Upload/pipeline safeguards:
+
+- Maximum upload duration: 300 seconds
+- Concurrency cap: 2 GPU jobs at a time
+- Locking via `/splats/_locks` to avoid over-scheduling
+
+To run/deploy backend, use Modal CLI against `modal_app.py` (for example, `modal serve` during development or `modal deploy` for production).
+
+## Viewer controls
 
 - `W A S D`: move
 - `Space`: move up
 - `C`: move down
 - `Shift`: speed boost
-- `Mouse`: look around (pointer lock)
+- `Mouse`: look around (click canvas to lock pointer)
 - `Esc`: release pointer lock
+- `Arrow Left` / `Arrow Right`: switch between scans for the selected room
+- `Re-center` button: reset camera to origin
+
+## Pipeline
+
+The Gaussian Splatting pipeline used by the backend lives in `pipeline/pipeline.sh`.
+
+For local, manual pipeline instructions, see `pipeline/README.md`.
