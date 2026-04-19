@@ -1,6 +1,7 @@
 import './landing.css'
 import maplibregl from 'maplibre-gl'
 import roomConfig from './room-config.json'
+import { fetchJson } from './api'
 
 const COORD_OVERRIDE_STORAGE_KEY = 'room-reveal.coordinate-overrides'
 
@@ -58,6 +59,7 @@ app.innerHTML = `
           <button id="explore-room" class="cta-btn is-hidden" type="button">Explore Room</button>
           <button id="open-upload" class="ghost-btn" type="button">Upload Video</button>
         </div>
+        <p id="explore-status" class="explore-status" aria-live="polite"></p>
       </aside>
     </div>
   </div>
@@ -79,6 +81,14 @@ const roomTypeStage = document.getElementById('room-type-stage')
 const roomTypePods = document.getElementById('room-type-pods')
 const exploreBtn = document.getElementById('explore-room')
 const uploadBtn = document.getElementById('open-upload')
+const exploreStatus = document.getElementById('explore-status')
+
+let isExploring = false
+
+function setExploreStatus(message, isError = false) {
+  exploreStatus.textContent = message
+  exploreStatus.classList.toggle('error', isError)
+}
 
 function toDisplayName(value) {
   return value
@@ -258,6 +268,11 @@ function renderSelectionState() {
   const readyToExplore = Boolean(state.selectedResidenceId && state.selectedRoomType)
   exploreBtn.classList.toggle('is-hidden', !readyToExplore)
   uploadBtn.classList.toggle('is-hidden', !readyToExplore)
+  if (!readyToExplore) {
+    setExploreStatus('')
+  }
+  exploreBtn.disabled = !readyToExplore || isExploring
+  exploreBtn.classList.toggle('is-loading', isExploring)
 
   requestAnimationFrame(() => {
     animatePodTransition(residencePods, residenceSnapshot)
@@ -282,8 +297,49 @@ document.getElementById('open-upload').addEventListener('click', () => {
   window.location.href = '/upload.html'
 })
 
-exploreBtn.addEventListener('click', () => {
-  // Intentionally no-op until explore flow is wired.
+exploreBtn.addEventListener('click', async () => {
+  const building = state.selectedResidenceId
+  const roomType = state.selectedRoomType
+
+  if (!building || !roomType || isExploring) {
+    return
+  }
+
+  isExploring = true
+  renderSelectionState()
+  setExploreStatus('Finding first available room scan...')
+
+  try {
+    const splats = await fetchJson(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}`)
+    if (!Array.isArray(splats) || splats.length === 0) {
+      setExploreStatus('No room scans are available yet for this selection.', true)
+      return
+    }
+
+    const firstId = splats
+      .map((item) => (typeof item?.id === 'string' ? item.id : ''))
+      .map((id) => (id.endsWith('.ply') ? id.slice(0, -4) : id))
+      .find((id) => id)
+
+    if (!firstId) {
+      setExploreStatus('No valid room scan IDs were found for this selection.', true)
+      return
+    }
+
+    const search = new URLSearchParams({
+      building,
+      room_type: roomType,
+      splat_id: firstId,
+    })
+
+    window.location.href = `/viewer.html?${search.toString()}`
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to load room scans.'
+    setExploreStatus(message, true)
+  } finally {
+    isExploring = false
+    renderSelectionState()
+  }
 })
 
 map.on('load', () => {

@@ -181,6 +181,18 @@ body {
   flex-shrink: 0;
 }
 
+.explore-status {
+  min-height: 1.25rem;
+  margin: 0.85rem 0 0;
+  color: rgba(194, 217, 255, 0.8);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+}
+
+.explore-status.error {
+  color: #ff8f95;
+}
+
 .cta-btn,
 .ghost-btn {
   border-radius: 12px;
@@ -191,6 +203,15 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
+}
+
+.cta-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.cta-btn.is-loading {
+  background: linear-gradient(120deg, #456990, #fa6559);
 }
 
 .cta-btn {

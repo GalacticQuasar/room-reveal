@@ -2,7 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { SplatFileType, SplatMesh } from '@sparkjsdev/spark'
 import startPositions from './start-positions.json'
-import { apiUrl } from './api'
+import { apiUrl, fetchJson } from './api'
 
 const params = new URLSearchParams(window.location.search)
 const building = params.get('building')
@@ -13,33 +13,39 @@ const app = document.querySelector('#app')
 app.innerHTML = `
   <div class="viewer-shell">
     <canvas id="viewport"></canvas>
-    <aside class="hud">
-      <h1>Spark Gaussian Splat Viewer</h1>
-      <p class="hint">Click the scene, then roam with WASD + mouse.</p>
-      <label class="toggle">
-        <input id="flip90Toggle" type="checkbox" />
-        <span>Flip 90deg (Nerfstudio)</span>
-      </label>
-      <button id="logCoordsBtn" class="secondary-btn" type="button" disabled>Log current position</button>
-      <p id="status">Preparing viewer...</p>
-      <div class="controls">
-        <p><strong>Move:</strong> W A S D</p>
-        <p><strong>Up / Down:</strong> Space / C</p>
-        <p><strong>Boost:</strong> Shift</p>
-        <p><strong>Mouse look:</strong> Pointer lock</p>
-        <p><strong>Unlock:</strong> Esc</p>
-      </div>
+    <aside id="controlsPod" class="controls-pod is-hidden" aria-label="Viewer controls">
+      <p><strong>Move:</strong> WASD</p>
+      <p><strong>Look:</strong> Mouse (click to lock)</p>
+      <p><strong>Unlock:</strong> Esc</p>
+      <p><strong>Switch:</strong> Arrow Left / Right</p>
     </aside>
+    <section id="loadingOverlay" class="loading-overlay">
+      <div class="loading-card">
+        <p id="loadingTitle" class="loading-title">Preparing room...</p>
+        <p id="loadingSubtitle" class="loading-subtitle">Initializing viewer</p>
+        <div class="loading-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="loadingFill" class="loading-fill"></div>
+        </div>
+        <p id="loadingPercent" class="loading-percent">0%</p>
+      </div>
+    </section>
+    <button id="prevSplat" class="nav-arrow nav-arrow-left" type="button" aria-label="View previous splat">&#x2039;</button>
+    <button id="nextSplat" class="nav-arrow nav-arrow-right" type="button" aria-label="View next splat">&#x203A;</button>
   </div>
 `
 
 const canvas = document.querySelector('#viewport')
-const status = document.querySelector('#status')
-const logCoordsBtn = document.querySelector('#logCoordsBtn')
-const flip90Toggle = document.querySelector('#flip90Toggle')
+const controlsPod = document.querySelector('#controlsPod')
+const loadingOverlay = document.querySelector('#loadingOverlay')
+const loadingTitle = document.querySelector('#loadingTitle')
+const loadingSubtitle = document.querySelector('#loadingSubtitle')
+const loadingFill = document.querySelector('#loadingFill')
+const loadingPercent = document.querySelector('#loadingPercent')
+const prevSplatButton = document.querySelector('#prevSplat')
+const nextSplatButton = document.querySelector('#nextSplat')
 
 const scene = new THREE.Scene()
-scene.fog = new THREE.Fog(0x0a111f, 22, 140)
+scene.background = new THREE.Color(0x000000)
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 3000)
 camera.position.set(0, 1.25, 5)
@@ -48,15 +54,15 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: fals
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.setSize(window.innerWidth, window.innerHeight)
 
-const hemi = new THREE.HemisphereLight(0xffffff, 0x1d2a45, 0.45)
-scene.add(hemi)
-
-const grid = new THREE.GridHelper(300, 300, 0x35527f, 0x233350)
-grid.position.y = -2
-scene.add(grid)
-
 let activeSplat = null
-let activeFileName = ''
+let availableSplats = []
+let currentSplatIndex = -1
+let isLoadingSplat = false
+let hasLoadedSplat = false
+let fakeProgress = 0
+let realProgress = 0
+let renderedProgress = 0
+let fakeProgressTimer = null
 const keyState = {}
 const euler = new THREE.Euler(0, 0, 0, 'YXZ')
 const worldUp = new THREE.Vector3(0, 1, 0)
@@ -71,21 +77,8 @@ const boostMultiplier = 2
 
 function applySplatOrientation(splat) {
   if (!splat) return
-  splat.rotation.x = flip90Toggle.checked ? -Math.PI / 2 : 0
-  splat.rotation.z = flip90Toggle.checked ? Math.PI : 0
-}
-
-function reapplyOrientation() {
-  if (activeSplat) {
-    applySplatOrientation(activeSplat)
-  }
-}
-
-flip90Toggle.addEventListener('change', reapplyOrientation)
-
-function setStatus(message, isError = false) {
-  status.textContent = message
-  status.classList.toggle('error', isError)
+  splat.rotation.x = -Math.PI / 2
+  splat.rotation.z = Math.PI
 }
 
 function getHardcodedStartPosition(fileName) {
@@ -104,44 +97,153 @@ function getHardcodedStartPosition(fileName) {
   return null
 }
 
-function formatCoord(value) {
-  return Number(value.toFixed(4))
+function normalizeSplatId(value) {
+  if (typeof value !== 'string' || !value) return ''
+  return value.endsWith('.ply') ? value.slice(0, -4) : value
 }
 
-function buildPositionJsonEntry(fileName, position) {
-  const coords = {
-    x: formatCoord(position.x),
-    y: formatCoord(position.y),
-    z: formatCoord(position.z),
+function resetLoadingProgressState() {
+  fakeProgress = 0
+  realProgress = 0
+  renderedProgress = 0
+}
+
+function stopFakeProgressTimer() {
+  if (fakeProgressTimer) {
+    window.clearInterval(fakeProgressTimer)
+    fakeProgressTimer = null
   }
-
-  return `"${fileName}": ${JSON.stringify(coords)}`
 }
 
-async function loadPlyFromRemote() {
-  if (!building || !roomType || !splatId) {
-    setStatus('Missing splat query parameters. Use the select page first.', true)
+function renderLoadingProgress(value) {
+  renderedProgress = Math.max(renderedProgress, Math.min(Math.max(value, 0), 100))
+  loadingFill.style.width = `${renderedProgress}%`
+  loadingPercent.textContent = `${Math.round(renderedProgress)}%`
+  loadingOverlay
+    .querySelector('.loading-track')
+    ?.setAttribute('aria-valuenow', String(Math.round(renderedProgress)))
+}
+
+function startLoadingOverlay(fileName) {
+  stopFakeProgressTimer()
+  resetLoadingProgressState()
+
+  loadingTitle.textContent = `Loading ${fileName}`
+  loadingSubtitle.textContent = 'Preparing scene...'
+  loadingOverlay.classList.remove('is-error')
+  loadingOverlay.classList.add('is-visible')
+  renderLoadingProgress(0)
+
+  const startAt = Date.now()
+  const fakeDurationMs = 30_000
+
+  fakeProgressTimer = window.setInterval(() => {
+    const elapsed = Date.now() - startAt
+    const t = Math.min(elapsed / fakeDurationMs, 1)
+    // Ease toward 92% over 30s while waiting for actual completion.
+    const eased = 1 - Math.pow(1 - t, 2)
+    fakeProgress = Math.max(fakeProgress, 92 * eased)
+    renderLoadingProgress(Math.max(fakeProgress, realProgress))
+  }, 100)
+}
+
+function setRealProgress(fraction) {
+  if (!Number.isFinite(fraction) || fraction <= 0) {
     return
   }
 
-  const fileName = `${splatId}.ply`
-  try {
-    setStatus(`Loading ${fileName}...`)
+  realProgress = Math.max(realProgress, Math.min(fraction, 1) * 100)
+  loadingSubtitle.textContent = 'Downloading room scan...'
+  renderLoadingProgress(Math.max(fakeProgress, realProgress))
+}
 
-    const url = apiUrl(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}/${encodeURIComponent(fileName)}`)
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`Unable to fetch splat (${response.status})`)
-    }
+async function finishLoadingOverlaySuccess() {
+  stopFakeProgressTimer()
+  loadingSubtitle.textContent = 'Finalizing...'
+  renderLoadingProgress(100)
+  await new Promise((resolve) => window.setTimeout(resolve, 260))
+  loadingOverlay.classList.remove('is-visible')
+}
 
+async function finishLoadingOverlayError(message) {
+  stopFakeProgressTimer()
+  loadingOverlay.classList.add('is-error')
+  loadingSubtitle.textContent = message
+  await new Promise((resolve) => window.setTimeout(resolve, 1200))
+  loadingOverlay.classList.remove('is-visible')
+}
+
+async function fetchPlyBytesWithProgress(url) {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Unable to fetch splat (${response.status})`)
+  }
+
+  const totalBytes = Number(response.headers.get('content-length') || 0)
+  if (!response.body || !Number.isFinite(totalBytes) || totalBytes <= 0) {
     const buffer = await response.arrayBuffer()
-    const fileBytes = new Uint8Array(buffer)
+    return new Uint8Array(buffer)
+  }
 
-    if (activeSplat) {
-      scene.remove(activeSplat)
-      activeSplat.dispose()
-      activeSplat = null
+  const reader = response.body.getReader()
+  const chunks = []
+  let receivedBytes = 0
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
     }
+    if (!value) {
+      continue
+    }
+
+    chunks.push(value)
+    receivedBytes += value.byteLength
+    setRealProgress(receivedBytes / totalBytes)
+  }
+
+  const fileBytes = new Uint8Array(receivedBytes)
+  let writeOffset = 0
+  for (const chunk of chunks) {
+    fileBytes.set(chunk, writeOffset)
+    writeOffset += chunk.byteLength
+  }
+
+  return fileBytes
+}
+
+function updateArrowState() {
+  const hasLeft = !isLoadingSplat && availableSplats.length > 1 && currentSplatIndex > 0
+  const hasRight =
+    !isLoadingSplat && availableSplats.length > 1 && currentSplatIndex >= 0 && currentSplatIndex < availableSplats.length - 1
+
+  prevSplatButton.classList.toggle('is-hidden', !hasLeft)
+  nextSplatButton.classList.toggle('is-hidden', !hasRight)
+  prevSplatButton.disabled = !hasLeft
+  nextSplatButton.disabled = !hasRight
+
+  controlsPod.classList.toggle('is-hidden', !hasLoadedSplat)
+}
+
+async function loadSplatByIndex(nextIndex) {
+  if (isLoadingSplat || nextIndex < 0 || nextIndex >= availableSplats.length) {
+    return
+  }
+
+  const nextId = availableSplats[nextIndex]
+  if (!nextId) {
+    return
+  }
+
+  isLoadingSplat = true
+  updateArrowState()
+
+  const fileName = `${nextId}.ply`
+  startLoadingOverlay(fileName)
+  try {
+    const url = apiUrl(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}/${encodeURIComponent(fileName)}`)
+    const fileBytes = await fetchPlyBytesWithProgress(url)
 
     const splat = new SplatMesh({
       fileBytes,
@@ -152,8 +254,14 @@ async function loadPlyFromRemote() {
 
     await splat.initialized
     applySplatOrientation(splat)
+
+    const previousSplat = activeSplat
     scene.add(splat)
     activeSplat = splat
+    if (previousSplat) {
+      scene.remove(previousSplat)
+      previousSplat.dispose()
+    }
 
     const center = new THREE.Vector3(0, 0, 0)
     const hardcodedStart = getHardcodedStartPosition(fileName)
@@ -168,35 +276,52 @@ async function loadPlyFromRemote() {
       camera.lookAt(center)
     } else {
       camera.position.copy(center)
+      camera.lookAt(center)
     }
 
-    activeFileName = fileName
-    logCoordsBtn.disabled = false
-    setStatus(`Loaded ${fileName}. Click inside the scene to lock pointer and fly.`)
+    currentSplatIndex = nextIndex
+    hasLoadedSplat = true
+    await finishLoadingOverlaySuccess()
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error while loading file'
-    setStatus(`Failed to load PLY: ${message}`, true)
+    console.error(`Failed to load PLY ${fileName}:`, message)
+    await finishLoadingOverlayError(message)
+  } finally {
+    isLoadingSplat = false
+    updateArrowState()
   }
 }
 
-logCoordsBtn.addEventListener('click', async () => {
-  if (!activeSplat || !activeFileName) {
-    setStatus('Splat is not loaded yet.', true)
+function goToPreviousSplat() {
+  if (currentSplatIndex <= 0) {
+    return
+  }
+  void loadSplatByIndex(currentSplatIndex - 1)
+}
+
+function goToNextSplat() {
+  if (currentSplatIndex < 0 || currentSplatIndex >= availableSplats.length - 1) {
+    return
+  }
+  void loadSplatByIndex(currentSplatIndex + 1)
+}
+
+prevSplatButton.addEventListener('click', goToPreviousSplat)
+nextSplatButton.addEventListener('click', goToNextSplat)
+
+document.addEventListener('keydown', (event) => {
+  if (event.code === 'ArrowLeft' && document.pointerLockElement !== canvas) {
+    event.preventDefault()
+    goToPreviousSplat()
     return
   }
 
-  const entry = buildPositionJsonEntry(activeFileName, camera.position)
-  console.log('[START_POSITION_ENTRY]', entry)
-
-  try {
-    await navigator.clipboard.writeText(entry)
-    setStatus(`Logged start position for ${activeFileName}. Copied entry to clipboard.`)
-  } catch {
-    setStatus(`Logged start position for ${activeFileName}. Check the console output.`)
+  if (event.code === 'ArrowRight' && document.pointerLockElement !== canvas) {
+    event.preventDefault()
+    goToNextSplat()
+    return
   }
-})
 
-document.addEventListener('keydown', (event) => {
   keyState[event.code] = true
 })
 
@@ -209,10 +334,7 @@ canvas.addEventListener('click', () => {
 })
 
 document.addEventListener('pointerlockchange', () => {
-  const isLocked = document.pointerLockElement === canvas
-  if (isLocked) {
-    setStatus('Pointer locked. Flying mode active.')
-  }
+  updateArrowState()
 })
 
 document.addEventListener('mousemove', (event) => {
@@ -260,4 +382,47 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
-void loadPlyFromRemote()
+async function initializeViewer() {
+  if (!building || !roomType) {
+    loadingOverlay.classList.remove('is-visible')
+    updateArrowState()
+    return
+  }
+
+  try {
+    const splats = await fetchJson(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}`)
+    availableSplats = Array.isArray(splats)
+      ? splats
+          .map((item) => normalizeSplatId(item?.id))
+          .filter((id) => id)
+      : []
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch splat list'
+    console.error(message)
+    availableSplats = []
+  }
+
+  if (availableSplats.length === 0 && splatId) {
+    const fallbackId = normalizeSplatId(splatId)
+    if (fallbackId) {
+      availableSplats = [fallbackId]
+    }
+  }
+
+  if (availableSplats.length === 0) {
+    loadingTitle.textContent = 'No room scans found'
+    loadingSubtitle.textContent = 'Return to landing and choose another room type.'
+    loadingOverlay.classList.add('is-visible')
+    renderLoadingProgress(100)
+    updateArrowState()
+    return
+  }
+
+  const requestedId = normalizeSplatId(splatId)
+  const requestedIndex = requestedId ? availableSplats.findIndex((id) => id === requestedId) : -1
+  const startIndex = requestedIndex >= 0 ? requestedIndex : 0
+  await loadSplatByIndex(startIndex)
+}
+
+updateArrowState()
+void initializeViewer()

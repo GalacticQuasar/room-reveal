@@ -1,15 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
 
 :root {
   --ink: #e7f0ff;
-  --ink-muted: #9bb2d4;
-  --accent: #6ce0c8;
-  --warning: #ff8e72;
-  --panel: rgba(9, 16, 32, 0.72);
-  --panel-border: rgba(108, 224, 200, 0.3);
-  --bg1: #06111f;
-  --bg2: #0e2446;
-  --bg3: #153667;
+  --ink-muted: rgba(231, 240, 255, 0.66);
+  --panel: rgba(8, 20, 40, 0.52);
+  --panel-border: rgba(197, 220, 255, 0.38);
 }
 
 * {
@@ -28,10 +23,7 @@ body {
   font-family: 'Space Grotesk', sans-serif;
   color: var(--ink);
   overflow: hidden;
-  background:
-    radial-gradient(circle at 84% 12%, rgba(108, 224, 200, 0.2), transparent 34%),
-    radial-gradient(circle at 13% 76%, rgba(255, 142, 114, 0.16), transparent 29%),
-    linear-gradient(140deg, var(--bg1) 0%, var(--bg2) 55%, var(--bg3) 100%);
+  background: #000;
 }
 
 .viewer-shell {
@@ -47,112 +39,170 @@ body {
   cursor: crosshair;
 }
 
-.hud {
+.controls-pod {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  width: min(420px, calc(100vw - 2rem));
-  border: 1px solid var(--panel-border);
-  border-radius: 18px;
-  padding: 1rem 1.1rem;
-  background: var(--panel);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+  top: 0.95rem;
+  left: 0.95rem;
+  border: 1px solid rgba(231, 240, 255, 0.2);
+  border-radius: 15px;
+  padding: 0.95rem 1.05rem;
+  background: rgba(10, 16, 28, 0.34);
+  backdrop-filter: blur(9px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+  max-width: min(360px, calc(100vw - 2rem));
+  z-index: 20;
 }
 
-.hud h1 {
+.controls-pod p {
   margin: 0;
-  font-size: clamp(1.2rem, 2.3vw, 1.6rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
 }
 
-.hint {
-  margin: 0.7rem 0 1rem;
+.controls-pod p + p {
+  margin-top: 0.32rem;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+  z-index: 30;
+}
+
+.loading-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.loading-card {
+  width: min(520px, calc(100vw - 2rem));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1rem 1.1rem 0.9rem;
+  background: rgba(15, 18, 24, 0.72);
+  backdrop-filter: blur(9px);
+}
+
+.loading-title {
+  margin: 0;
+  font-size: clamp(1rem, 2.4vw, 1.22rem);
+  font-weight: 700;
+}
+
+.loading-subtitle {
+  margin: 0.35rem 0 0.78rem;
+  font-size: 0.82rem;
   color: var(--ink-muted);
 }
 
-.upload {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--panel-border);
+.loading-track {
+  width: 100%;
+  height: 9px;
   border-radius: 999px;
-  padding: 0.55rem 1rem;
-  background: rgba(108, 224, 200, 0.14);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform 130ms ease, background-color 130ms ease;
-  font-weight: 600;
-}
-
-.upload:hover {
-  transform: translateY(-1px);
-  background: rgba(108, 224, 200, 0.24);
-}
-
-.upload input {
-  display: none;
-}
-
-.secondary-btn {
-  margin-left: 0.55rem;
-  border: 1px solid var(--panel-border);
-  border-radius: 999px;
-  padding: 0.55rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--ink);
-  cursor: pointer;
-  transition: transform 130ms ease, background-color 130ms ease, opacity 130ms ease;
-  font-family: inherit;
-  font-weight: 600;
-}
-
-.secondary-btn:hover:enabled {
-  transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
 }
 
-.secondary-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+.loading-fill {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #456990, #fa6559);
+  transition: width 160ms linear;
 }
 
-@media (max-width: 520px) {
-  .secondary-btn {
-    margin-left: 0;
-    margin-top: 0.55rem;
-    width: 100%;
-  }
-}
-
-#status {
-  margin: 0.9rem 0 0;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88rem;
-  color: var(--accent);
-}
-
-#status.error {
-  color: var(--warning);
-}
-
-.controls {
-  margin-top: 0.75rem;
+.loading-percent {
+  margin: 0.48rem 0 0;
+  font-size: 0.78rem;
   color: var(--ink-muted);
-  font-size: 0.92rem;
 }
 
-.controls p {
-  margin: 0.35rem 0;
+.loading-overlay.is-error .loading-fill {
+  background: linear-gradient(90deg, #fa6559, #456990);
 }
 
 @media (max-width: 700px) {
-  .hud {
-    top: auto;
-    bottom: 0.7rem;
+  .controls-pod {
+    top: 0.7rem;
     left: 0.7rem;
-    right: 0.7rem;
-    width: auto;
-    padding: 0.9rem;
+    padding: 0.82rem 0.9rem;
+    max-width: min(320px, calc(100vw - 1.4rem));
+  }
+
+  .controls-pod p {
+    font-size: 0.88rem;
+  }
+
+  .controls-pod p + p {
+    margin-top: 0.28rem;
+  }
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(2.8rem, 6vw, 4.2rem);
+  height: clamp(2.8rem, 6vw, 4.2rem);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  backdrop-filter: blur(12px);
+  font-family: inherit;
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  transition: transform 150ms ease, background-color 150ms ease, opacity 150ms ease;
+}
+
+.nav-arrow:hover:enabled {
+  transform: translateY(-1px);
+  background: rgba(8, 20, 40, 0.7);
+}
+
+.nav-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.26;
+}
+
+.nav-arrow.is-hidden,
+.controls-pod.is-hidden {
+  display: none;
+}
+
+.nav-arrow-left {
+  left: clamp(0.75rem, 2.4vw, 1.5rem);
+}
+
+.nav-arrow-right {
+  right: clamp(0.75rem, 2.4vw, 1.5rem);
+}
+
+@media (max-width: 700px) {
+  .nav-arrow {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+    width: 3.1rem;
+    height: 3.1rem;
+    font-size: 2rem;
+  }
+
+  .nav-arrow-left {
+    left: calc(50% - 3.8rem);
+  }
+
+  .nav-arrow-right {
+    right: calc(50% - 3.8rem);
   }
 }
