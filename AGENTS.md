@@ -14,14 +14,6 @@ High-signal notes for OpenCode sessions in this repo.
   - `src/landing-dev.js` for `/landing-dev.html`
 - Backend API lives in `modal_app.py` (FastAPI on Modal) and is consumed by `src/api.js`.
 
-## Commands and checks
-
-- Install: `npm install`
-- Dev server: `npm run dev`
-- Build check: `npm run build`
-- Preview build: `npm run preview`
-- There are no repo scripts for lint/test/typecheck; `npm run build` is the minimum automated validation.
-
 ## Runtime and env gotchas
 
 - Frontend API base URL is `VITE_MODAL_ENDPOINT` (see `.env.example`).
