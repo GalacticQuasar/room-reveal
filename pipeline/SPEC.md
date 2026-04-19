@@ -29,5 +29,3 @@ Step 3: Export the resulting 3D scene as Gaussian Splats in .ply format:
 ns-export gaussian-splat --load-config outputs/my_splat/splatfacto/latest/config.yml --output-dir exports/ 
 ```
 > This will save the .ply file to `exports/splat.ply`.
-
-Objective: Automate the above steps in a bash script that accepts a video file path as input and produces a Gaussian Splat .ply file as output, following the same process as outlined above. The script should handle all necessary steps, including determining video duration, running COLMAP processing, training the model, and exporting the final .ply file.

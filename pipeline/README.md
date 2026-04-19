@@ -1,5 +1,7 @@
 # Gaussian Splatting Pipeline
 
+> NOTE: This pipeline is instructions on how to run the nerfstudio gaussian splatting pipeline locally. The backend pipeline executes the flow in `pipeline/pipeline.sh` in a GPU Modal job, so you can also run it by uploading a video through the frontend and letting the backend handle it. However, if you want to run it locally for testing or development purposes, follow the instructions below.
+
 This pipeline was built to create gaussian splats of a full living space from a video.
 
 - Input: Video (or folder of photos) of a room, may be taken with a phone camera
