@@ -1,9 +1,11 @@
 import './landing.css'
 import maplibregl from 'maplibre-gl'
 import roomConfig from './room-config.json'
-import { fetchJson } from './api'
+import { apiUrl, fetchJson } from './api'
 
 const COORD_OVERRIDE_STORAGE_KEY = 'room-reveal.coordinate-overrides'
+const MAX_DURATION_SECONDS = 300
+const UPLOAD_FAKE_PROGRESS_DURATION_MS = 25_000
 
 function getMergedRoomConfig() {
   try {
@@ -63,6 +65,37 @@ app.innerHTML = `
         <p id="explore-status" class="explore-status" aria-live="polite"></p>
       </aside>
     </div>
+
+    <div id="upload-modal" class="upload-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="upload-modal-title">
+      <div id="upload-modal-backdrop" class="upload-modal-backdrop" aria-hidden="true"></div>
+      <section class="upload-modal-card">
+        <header class="upload-modal-head">
+          <h2 id="upload-modal-title">Upload Room Video</h2>
+          <button id="close-upload-modal" class="upload-modal-close" type="button" aria-label="Close upload modal"></button>
+        </header>
+        <form id="upload-modal-form" class="upload-modal-form" novalidate>
+          <label id="upload-dropzone" class="upload-dropzone" for="upload-video-input">
+            <input id="upload-video-input" type="file" accept="video/*" required>
+            <span class="upload-dropzone-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-icon lucide-file"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+            </span>
+            <span class="upload-dropzone-copy">
+              <span class="upload-dropzone-title">Drop video here or click to browse</span>
+              <span class="upload-dropzone-subtitle">Accepted: video files up to 5 minutes.</span>
+              <span id="upload-selected-file" class="upload-selected-file">No file selected.</span>
+            </span>
+          </label>
+          <button id="upload-modal-submit" class="cta-btn" type="submit">Submit Upload</button>
+        </form>
+        <div id="upload-progress" class="upload-progress" aria-hidden="true">
+          <div id="upload-progress-track" class="upload-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="upload-progress-fill" class="upload-progress-fill"></div>
+          </div>
+          <p id="upload-progress-percent" class="upload-progress-percent">0%</p>
+        </div>
+        <p id="upload-modal-status" class="explore-status" aria-live="polite"></p>
+      </section>
+    </div>
   </div>
 `
 
@@ -81,12 +114,160 @@ const roomTypePods = document.getElementById('room-type-pods')
 const exploreBtn = document.getElementById('explore-room')
 const uploadBtn = document.getElementById('open-upload')
 const exploreStatus = document.getElementById('explore-status')
+const landingPage = document.getElementById('landing-page')
+
+const uploadModal = document.getElementById('upload-modal')
+const uploadModalBackdrop = document.getElementById('upload-modal-backdrop')
+const closeUploadModalBtn = document.getElementById('close-upload-modal')
+const uploadForm = document.getElementById('upload-modal-form')
+const uploadDropzone = document.getElementById('upload-dropzone')
+const uploadVideoInput = document.getElementById('upload-video-input')
+const uploadSelectedFile = document.getElementById('upload-selected-file')
+const uploadModalSubmit = document.getElementById('upload-modal-submit')
+const uploadModalStatus = document.getElementById('upload-modal-status')
+const uploadProgress = document.getElementById('upload-progress')
+const uploadProgressTrack = document.getElementById('upload-progress-track')
+const uploadProgressFill = document.getElementById('upload-progress-fill')
+const uploadProgressPercent = document.getElementById('upload-progress-percent')
 
 let isExploring = false
+let isUploading = false
+let uploadFakeProgress = 0
+let uploadRenderedProgress = 0
+let uploadProgressTimer = null
 
 function setExploreStatus(message, isError = false) {
   exploreStatus.textContent = message
   exploreStatus.classList.toggle('error', isError)
+}
+
+function setUploadStatus(message, isError = false) {
+  uploadModalStatus.textContent = message
+  uploadModalStatus.classList.toggle('error', isError)
+}
+
+function updateSelectedFile(file) {
+  if (!file) {
+    uploadSelectedFile.textContent = 'No file selected.'
+    return
+  }
+  uploadSelectedFile.textContent = `Selected: ${file.name}`
+}
+
+function resetUploadProgressState() {
+  uploadFakeProgress = 0
+  uploadRenderedProgress = 0
+}
+
+function stopUploadProgressTimer() {
+  if (uploadProgressTimer) {
+    window.clearInterval(uploadProgressTimer)
+    uploadProgressTimer = null
+  }
+}
+
+function renderUploadProgress(value) {
+  uploadRenderedProgress = Math.max(uploadRenderedProgress, Math.min(Math.max(value, 0), 100))
+  uploadProgressFill.style.width = `${uploadRenderedProgress}%`
+  uploadProgressPercent.textContent = `${Math.round(uploadRenderedProgress)}%`
+  uploadProgressTrack.setAttribute('aria-valuenow', String(Math.round(uploadRenderedProgress)))
+}
+
+function hideUploadProgress() {
+  stopUploadProgressTimer()
+  uploadProgress.classList.remove('is-visible')
+  uploadProgress.setAttribute('aria-hidden', 'true')
+  resetUploadProgressState()
+  renderUploadProgress(0)
+}
+
+function startUploadProgress() {
+  stopUploadProgressTimer()
+  resetUploadProgressState()
+  uploadProgress.classList.add('is-visible')
+  uploadProgress.setAttribute('aria-hidden', 'false')
+  renderUploadProgress(0)
+
+  const startAt = Date.now()
+  uploadProgressTimer = window.setInterval(() => {
+    const elapsed = Date.now() - startAt
+    const t = Math.min(elapsed / UPLOAD_FAKE_PROGRESS_DURATION_MS, 1)
+    const eased = 1 - Math.pow(1 - t, 2)
+    uploadFakeProgress = Math.max(uploadFakeProgress, 92 * eased)
+    renderUploadProgress(uploadFakeProgress)
+  }, 100)
+}
+
+async function finishUploadProgressSuccess() {
+  stopUploadProgressTimer()
+  renderUploadProgress(100)
+  await new Promise((resolve) => window.setTimeout(resolve, 260))
+  hideUploadProgress()
+}
+
+function finishUploadProgressError() {
+  hideUploadProgress()
+}
+
+function setInputFile(file) {
+  if (!file) {
+    uploadVideoInput.value = ''
+    updateSelectedFile(null)
+    return
+  }
+
+  const transfer = new DataTransfer()
+  transfer.items.add(file)
+  uploadVideoInput.files = transfer.files
+  updateSelectedFile(file)
+}
+
+function openUploadModal() {
+  if (isUploading) {
+    return
+  }
+
+  const building = state.selectedResidenceId
+  const roomType = state.selectedRoomType
+  if (!building || !roomType) {
+    setExploreStatus('Please select a residence and room type before uploading.', true)
+    return
+  }
+
+  setUploadStatus('')
+  hideUploadProgress()
+  uploadModal.classList.remove('is-hidden')
+  landingPage.classList.add('upload-modal-open')
+}
+
+function closeUploadModal() {
+  if (isUploading) {
+    return
+  }
+
+  uploadModal.classList.add('is-hidden')
+  landingPage.classList.remove('upload-modal-open')
+  uploadForm.reset()
+  setInputFile(null)
+  hideUploadProgress()
+}
+
+async function getVideoDuration(file) {
+  const objectUrl = URL.createObjectURL(file)
+  const video = document.createElement('video')
+  video.preload = 'metadata'
+
+  const duration = await new Promise((resolve, reject) => {
+    video.onloadedmetadata = () => {
+      const value = Number.isFinite(video.duration) ? video.duration : NaN
+      resolve(value)
+    }
+    video.onerror = () => reject(new Error('Unable to read video duration'))
+    video.src = objectUrl
+  })
+
+  URL.revokeObjectURL(objectUrl)
+  return duration
 }
 
 function toDisplayName(value) {
@@ -290,8 +471,119 @@ const map = new maplibregl.Map({
 
 map.addControl(new maplibregl.NavigationControl())
 
-document.getElementById('open-upload').addEventListener('click', () => {
-  window.location.href = '/upload.html'
+uploadBtn.addEventListener('click', () => {
+  openUploadModal()
+})
+
+closeUploadModalBtn.addEventListener('click', () => {
+  closeUploadModal()
+})
+
+uploadModalBackdrop.addEventListener('click', () => {
+  closeUploadModal()
+})
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !uploadModal.classList.contains('is-hidden')) {
+    closeUploadModal()
+  }
+})
+
+uploadVideoInput.addEventListener('change', () => {
+  const file = uploadVideoInput.files?.[0] || null
+  updateSelectedFile(file)
+})
+
+uploadDropzone.addEventListener('dragover', (event) => {
+  event.preventDefault()
+  uploadDropzone.classList.add('is-dragging')
+})
+
+uploadDropzone.addEventListener('dragleave', (event) => {
+  if (event.currentTarget === event.target) {
+    uploadDropzone.classList.remove('is-dragging')
+  }
+})
+
+uploadDropzone.addEventListener('drop', (event) => {
+  event.preventDefault()
+  uploadDropzone.classList.remove('is-dragging')
+
+  const file = event.dataTransfer?.files?.[0]
+  if (!file) {
+    return
+  }
+  if (!file.type.startsWith('video/')) {
+    setUploadStatus('Please drop a valid video file.', true)
+    return
+  }
+
+  setInputFile(file)
+  setUploadStatus('Video selected. Ready to upload.')
+})
+
+uploadForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+  if (isUploading) {
+    return
+  }
+
+  const building = state.selectedResidenceId
+  const roomType = state.selectedRoomType
+  const file = uploadVideoInput.files?.[0]
+
+  if (!building || !roomType || !file) {
+    setUploadStatus('Please drag/drop or select a video file before submission.', true)
+    return
+  }
+
+  isUploading = true
+  uploadModalSubmit.disabled = true
+  setUploadStatus('Validating video...')
+
+  try {
+    const duration = await getVideoDuration(file)
+    if (!Number.isFinite(duration)) {
+      throw new Error('Unable to validate video duration')
+    }
+    if (duration > MAX_DURATION_SECONDS) {
+      throw new Error('Video must be 5 minutes or less')
+    }
+
+    setUploadStatus('')
+    startUploadProgress()
+    const payload = new FormData()
+    payload.append('video', file)
+    payload.append('building', building)
+    payload.append('room_type', roomType)
+
+    const response = await fetch(apiUrl('/upload'), {
+      method: 'POST',
+      body: payload,
+    })
+
+    const json = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      const message = typeof json.detail === 'string' ? json.detail : 'Upload failed'
+      throw new Error(message)
+    }
+
+    setUploadStatus(
+      typeof json.message === 'string'
+        ? json.message
+        : 'Thank you for your contribution! Processing takes about 15-30 minutes before the splat appears.'
+    )
+    await finishUploadProgressSuccess()
+    uploadForm.reset()
+    setInputFile(null)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Upload failed'
+    setUploadStatus(message, true)
+    finishUploadProgressError()
+  } finally {
+    isUploading = false
+    uploadModalSubmit.disabled = false
+  }
 })
 
 exploreBtn.addEventListener('click', async () => {
