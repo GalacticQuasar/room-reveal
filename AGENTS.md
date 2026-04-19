@@ -39,11 +39,9 @@ High-signal notes for OpenCode sessions in this repo.
 
 ## Data/config boundaries that are easy to confuse
 
-- `src/room-config.json` (frontend landing/dev map UI) uses shape:
+- `src/room-config.json` is the single frontend config source for landing, upload, and select pages; shape:
   - building -> `{ "room-types": [...], latitude, longitude }`
-- `/config` from `modal_app.py` (used by `src/upload.js` and `src/select.js`) returns shape:
-  - building -> `[roomType, ...]`
-- Do not assume these two config sources are interchangeable.
+- Backend does not expose a `/config` endpoint; it accepts `building` and `room_type` values from the client and uses them directly in splat/upload paths.
 
 ## Current UX wiring caveats
 
@@ -55,7 +53,6 @@ High-signal notes for OpenCode sessions in this repo.
 
 - `pipeline/pipeline.sh` is the script used by `modal_app.py` GPU job to produce `splat.ply` from uploaded video.
 - Modal API enforces:
-  - room/building validation via hardcoded `ROOM_CONFIG` in `modal_app.py`
   - max upload duration 300s
   - max concurrent pipeline jobs `MAX_CONCURRENT_JOBS = 2` with file locks under `/splats/_locks`
 

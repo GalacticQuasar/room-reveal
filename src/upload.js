@@ -1,5 +1,6 @@
 import './upload.css'
-import { fetchJson, apiUrl } from './api'
+import roomConfig from './room-config.json'
+import { apiUrl } from './api'
 
 const MAX_DURATION_SECONDS = 300
 
@@ -49,8 +50,6 @@ const videoInput = document.querySelector('#video')
 const statusEl = document.querySelector('#status')
 const submitBtn = document.querySelector('#submitBtn')
 
-let roomConfig = {}
-
 function setStatus(text, isError = false) {
   statusEl.textContent = text
   statusEl.classList.toggle('error', isError)
@@ -69,7 +68,7 @@ function populateBuildings() {
 function populateRoomTypes(building) {
   roomTypeSelect.innerHTML = '<option value="">Select a room type</option>'
 
-  const roomTypes = roomConfig[building] || []
+  const roomTypes = roomConfig[building]?.['room-types'] || []
   for (const roomType of roomTypes) {
     const option = document.createElement('option')
     option.value = roomType
@@ -158,15 +157,9 @@ form.addEventListener('submit', async (event) => {
   }
 })
 
-async function init() {
-  try {
-    roomConfig = await fetchJson('/config')
-    populateBuildings()
-    setStatus('Choose a building, room type, and video to upload.')
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to load config'
-    setStatus(`Failed to load configuration: ${message}`, true)
-  }
+function init() {
+  populateBuildings()
+  setStatus('Choose a building, room type, and video to upload.')
 }
 
-void init()
+init()

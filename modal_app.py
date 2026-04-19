@@ -13,12 +13,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 
-ROOM_CONFIG = {
-    "frieda-parker": ["suite", "semi-suite"],
-    "winifred-parker": ["suite", "semi-suite"],
-    "hillenbrand": ["suite"],
-}
-
 MAX_VIDEO_DURATION_SECONDS = 300
 MAX_CONCURRENT_JOBS = 2
 LOCK_STALE_AFTER_SECONDS = 60 * 60 * 6
@@ -36,14 +30,6 @@ image = (
     .pip_install("fastapi[standard]==0.115.6")
     .add_local_file("pipeline/pipeline.sh", remote_path="/workspace/pipeline.sh")
 )
-
-
-def _assert_valid_room_selection(building: str, room_type: str) -> None:
-    allowed_room_types = ROOM_CONFIG.get(building)
-    if not allowed_room_types:
-        raise HTTPException(status_code=400, detail="Unknown building")
-    if room_type not in allowed_room_types:
-        raise HTTPException(status_code=400, detail="Invalid room_type for selected building")
 
 
 def _duration_seconds_from_file(video_path: Path) -> int:
@@ -160,14 +146,8 @@ web_app.add_middleware(
 )
 
 
-@web_app.get("/config")
-def get_config() -> dict[str, list[str]]:
-    return ROOM_CONFIG
-
-
 @web_app.get("/splats/{building}/{room_type}")
 def list_splats(building: str, room_type: str) -> list[dict[str, str]]:
-    _assert_valid_room_selection(building, room_type)
     volume.reload()
 
     target_dir = Path("/splats") / building / room_type
@@ -191,7 +171,6 @@ def list_splats(building: str, room_type: str) -> list[dict[str, str]]:
 
 @web_app.get("/splats/{building}/{room_type}/{file_name}")
 def get_splat_file(building: str, room_type: str, file_name: str) -> FileResponse:
-    _assert_valid_room_selection(building, room_type)
     if not file_name.endswith(".ply"):
         raise HTTPException(status_code=400, detail="Only .ply files are supported")
 
@@ -209,8 +188,6 @@ async def upload_video(
     building: str = Form(...),
     room_type: str = Form(...),
 ) -> dict[str, str]:
-    _assert_valid_room_selection(building, room_type)
-
     content_type = (video.content_type or "").lower()
     if not content_type.startswith("video/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be a video")

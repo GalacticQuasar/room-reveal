@@ -1,4 +1,5 @@
 import './select.css'
+import roomConfig from './room-config.json'
 import { fetchJson } from './api'
 
 const app = document.querySelector('#app')
@@ -46,7 +47,6 @@ const splatSelect = document.querySelector('#splat')
 const viewBtn = document.querySelector('#viewBtn')
 const statusEl = document.querySelector('#status')
 
-let roomConfig = {}
 let splatCache = {}
 
 function setStatus(text, isError = false) {
@@ -66,7 +66,7 @@ function normalizeId(value) {
   return value.endsWith('.ply') ? value.slice(0, -4) : value
 }
 
-async function populateBuildings() {
+function populateBuildings() {
   const buildings = Object.keys(roomConfig).sort()
   for (const building of buildings) {
     const option = document.createElement('option')
@@ -98,7 +98,7 @@ async function refreshRoomTypes() {
     return
   }
 
-  const roomTypes = roomConfig[building] || []
+  const roomTypes = roomConfig[building]?.['room-types'] || []
   for (const roomType of roomTypes) {
     const option = document.createElement('option')
     option.value = roomType
@@ -170,15 +170,9 @@ viewBtn.addEventListener('click', () => {
   window.location.href = `/viewer.html?${search.toString()}`
 })
 
-async function init() {
-  try {
-    roomConfig = await fetchJson('/config')
-    await populateBuildings()
-    setStatus('Select a building to get started.')
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to load config'
-    setStatus(`Failed to load configuration: ${message}`, true)
-  }
+function init() {
+  populateBuildings()
+  setStatus('Select a building to get started.')
 }
 
-void init()
+init()
