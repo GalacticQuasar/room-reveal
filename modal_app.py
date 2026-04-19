@@ -97,7 +97,7 @@ def _release_slot(lock_path: str) -> None:
     image=image,
     gpu="A10G",
     timeout=60 * 60,
-    volumes={"/splats": volume, "/root/.cache": cache_volume},
+    volumes={"/splats": volume, "/cache": cache_volume},
 )
 def run_pipeline_job(job_id: str, building: str, room_type: str, upload_path: str, lock_path: str) -> None:
     upload_video = Path(upload_path)
@@ -109,6 +109,16 @@ def run_pipeline_job(job_id: str, building: str, room_type: str, upload_path: st
     output_dir = temp_root / "exports"
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    cache_root = Path("/cache")
+    cache_root.mkdir(parents=True, exist_ok=True)
+    pipeline_env = {
+        **os.environ,
+        "XDG_CACHE_HOME": str(cache_root),
+        "PIP_CACHE_DIR": str(cache_root / "pip"),
+        "TORCH_HOME": str(cache_root / "torch"),
+        "HF_HOME": str(cache_root / "huggingface"),
+    }
+
     try:
         subprocess.run(
             ["chmod", "+x", "/workspace/pipeline.sh"],
@@ -117,6 +127,7 @@ def run_pipeline_job(job_id: str, building: str, room_type: str, upload_path: st
         subprocess.run(
             ["/workspace/pipeline.sh", str(upload_video), str(output_dir)],
             cwd=str(temp_root),
+            env=pipeline_env,
             check=True,
         )
 
