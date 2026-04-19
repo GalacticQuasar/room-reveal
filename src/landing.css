@@ -189,11 +189,18 @@ body {
 }
 
 .explore-status {
-  min-height: 1.25rem;
-  margin: 0.85rem 0 0;
+  margin: 0;
   color: rgba(194, 217, 255, 0.8);
   font-size: 0.85rem;
   letter-spacing: 0.01em;
+}
+
+.explore-status:empty {
+  display: none;
+}
+
+.explore-status:not(:empty) {
+  margin-top: 0.55rem;
 }
 
 .explore-status.error {
@@ -218,7 +225,9 @@ body {
 }
 
 .cta-btn.is-loading {
-  background: linear-gradient(120deg, #456990, #fa6559);
+  background: rgba(241, 240, 240, 0.06);
+  border-color: var(--surface-2);
+  filter: saturate(0.92);
 }
 
 .cta-btn {

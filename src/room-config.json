@@ -1,4 +1,12 @@
 {
+  "frieda-parker": {
+    "room-types": [
+      "Suite semi + shared bath AC",
+      "Suite + shared bath AC"
+    ],
+    "latitude": 40.42821,
+    "longitude": -86.9202
+  },
   "cary-quad": {
     "room-types": [
       "Triple",
@@ -37,14 +45,6 @@
     ],
     "latitude": 40.4246986,
     "longitude": -86.9252289
-  },
-  "frieda-parker": {
-    "room-types": [
-      "Suite semi + shared bath AC",
-      "Suite + shared bath AC"
-    ],
-    "latitude": 40.42821,
-    "longitude": -86.9202
   },
   "winifred-parker": {
     "room-types": [

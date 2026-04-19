@@ -72,9 +72,7 @@ const state = {
   isRoomTypeExpanded: false,
 }
 
-const residences = Object.entries(activeRoomConfig).sort(([residenceA], [residenceB]) =>
-  toDisplayName(residenceA).localeCompare(toDisplayName(residenceB), undefined, { sensitivity: 'base' })
-)
+const residences = Object.entries(activeRoomConfig)
 
 const residencePods = document.getElementById('residence-pods')
 const roomTypeStage = document.getElementById('room-type-stage')
@@ -219,9 +217,7 @@ function renderRoomTypePods() {
     return
   }
 
-  const roomTypes = [...(activeRoomConfig[residenceId]['room-types'] || [])].sort((roomTypeA, roomTypeB) =>
-    roomTypeA.localeCompare(roomTypeB, undefined, { sensitivity: 'base' })
-  )
+  const roomTypes = [...(activeRoomConfig[residenceId]['room-types'] || [])]
   const selectedRoom = state.selectedRoomType
 
   roomTypeStage.classList.remove('is-hidden')
