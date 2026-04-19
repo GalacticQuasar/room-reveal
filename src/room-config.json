@@ -2,7 +2,9 @@
   "frieda-parker": {
     "room-types": [
       "Suite semi + shared bath AC",
-      "Suite + shared bath AC"
+      "Suite + shared bath AC",
+      "(Example) Study Room 1",
+      "(Example) Study Room 2"
     ],
     "latitude": 40.42821,
     "longitude": -86.9202
