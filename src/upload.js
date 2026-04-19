@@ -38,7 +38,6 @@ app.innerHTML = `
       </form>
 
       <p id="status" class="status">Loading configuration...</p>
-      <p class="api">API: <code id="apiBase"></code></p>
     </section>
   </main>
 `
@@ -49,9 +48,6 @@ const roomTypeSelect = document.querySelector('#roomType')
 const videoInput = document.querySelector('#video')
 const statusEl = document.querySelector('#status')
 const submitBtn = document.querySelector('#submitBtn')
-const apiBaseEl = document.querySelector('#apiBase')
-
-apiBaseEl.textContent = apiUrl('/').replace(/\/$/, '')
 
 let roomConfig = {}
 
