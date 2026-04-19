@@ -2,8 +2,9 @@ import './landing-dev.css'
 import maplibregl from 'maplibre-gl'
 import roomConfig from './room-config.json'
 
-const VARIANCE_MIN = -10
-const VARIANCE_MAX = 10
+const COORD_OVERRIDE_STORAGE_KEY = 'room-reveal.coordinate-overrides'
+const VARIANCE_MIN = -1000
+const VARIANCE_MAX = 1000
 const VARIANCE_STEP = 0.1
 const VARIANCE_SCALE = 0.0001
 
@@ -63,6 +64,53 @@ app.innerHTML = `
 `
 
 const editableConfig = JSON.parse(JSON.stringify(roomConfig))
+
+function loadOverridesIntoEditableConfig() {
+  try {
+    const rawOverrides = localStorage.getItem(COORD_OVERRIDE_STORAGE_KEY)
+    if (!rawOverrides) {
+      return
+    }
+
+    const overrides = JSON.parse(rawOverrides)
+    for (const [residenceId, value] of Object.entries(overrides || {})) {
+      if (!editableConfig[residenceId]) {
+        continue
+      }
+
+      if (Number.isFinite(value?.latitude)) {
+        editableConfig[residenceId].latitude = value.latitude
+      }
+
+      if (Number.isFinite(value?.longitude)) {
+        editableConfig[residenceId].longitude = value.longitude
+      }
+    }
+  } catch {
+    // Ignore malformed local overrides and fall back to bundled config.
+  }
+}
+
+function saveOverridesFromEditableConfig() {
+  const overrides = {}
+
+  for (const [residenceId, value] of Object.entries(editableConfig)) {
+    if (Number.isFinite(value?.latitude) && Number.isFinite(value?.longitude)) {
+      overrides[residenceId] = {
+        latitude: value.latitude,
+        longitude: value.longitude,
+      }
+    }
+  }
+
+  try {
+    localStorage.setItem(COORD_OVERRIDE_STORAGE_KEY, JSON.stringify(overrides))
+  } catch {
+    // Storage can fail in private mode; keep working without persistence.
+  }
+}
+
+loadOverridesIntoEditableConfig()
 const residenceIds = Object.keys(editableConfig).sort()
 
 const residenceSelect = document.getElementById('residence-select')
@@ -75,6 +123,7 @@ const baseLngEl = document.getElementById('base-lng')
 const adjustedLatEl = document.getElementById('adjusted-lat')
 const adjustedLngEl = document.getElementById('adjusted-lng')
 const statusEl = document.getElementById('status')
+let suppressMapCenterSync = false
 
 const map = new maplibregl.Map({
   container: 'map-container',
@@ -112,6 +161,15 @@ map.on('load', () => {
   })
 
   renderCoordinateState()
+})
+
+map.on('moveend', () => {
+  if (suppressMapCenterSync) {
+    suppressMapCenterSync = false
+    return
+  }
+
+  syncSlidersFromMapCenter()
 })
 
 for (const residenceId of residenceIds) {
@@ -154,6 +212,7 @@ function getAdjustedCoords() {
 }
 
 function flyToAdjusted({ adjustedLat, adjustedLng }) {
+  suppressMapCenterSync = true
   map.flyTo({
     center: [adjustedLng, adjustedLat],
     zoom: 17.4,
@@ -164,7 +223,8 @@ function flyToAdjusted({ adjustedLat, adjustedLng }) {
   })
 }
 
-function renderCoordinateState() {
+function renderCoordinateState(options = {}) {
+  const { shouldFlyTo = true } = options
   const coords = getAdjustedCoords()
 
   latVarianceValue.textContent = coords.latVariance.toFixed(1)
@@ -175,9 +235,28 @@ function renderCoordinateState() {
   adjustedLatEl.textContent = coords.adjustedLat.toFixed(7)
   adjustedLngEl.textContent = coords.adjustedLng.toFixed(7)
 
-  if (map.isStyleLoaded()) {
+  if (shouldFlyTo && map.isStyleLoaded()) {
     flyToAdjusted(coords)
   }
+}
+
+function syncSlidersFromMapCenter() {
+  if (!map.isStyleLoaded()) {
+    return
+  }
+
+  const residence = getCurrentResidence()
+  if (!residence) {
+    return
+  }
+
+  const center = map.getCenter()
+  const latVariance = (center.lat - Number(residence.latitude)) / VARIANCE_SCALE
+  const lngVariance = (center.lng - Number(residence.longitude)) / VARIANCE_SCALE
+
+  latVarianceInput.value = latVariance.toFixed(1)
+  lngVarianceInput.value = lngVariance.toFixed(1)
+  renderCoordinateState({ shouldFlyTo: false })
 }
 
 function setStatus(message) {
@@ -196,9 +275,10 @@ function applyCurrentResidenceUpdate() {
 
   residence.latitude = Number(coords.adjustedLat.toFixed(7))
   residence.longitude = Number(coords.adjustedLng.toFixed(7))
+  saveOverridesFromEditableConfig()
 
   resetSliders()
-  setStatus(`Saved ${toDisplayName(residenceSelect.value)} to lat ${residence.latitude}, lng ${residence.longitude}.`)
+  setStatus(`Saved ${toDisplayName(residenceSelect.value)} to lat ${residence.latitude}, lng ${residence.longitude}. Regular landing now uses this override.`)
 }
 
 async function copyConfigJson() {

@@ -2,6 +2,40 @@ import './landing.css'
 import maplibregl from 'maplibre-gl'
 import roomConfig from './room-config.json'
 
+const COORD_OVERRIDE_STORAGE_KEY = 'room-reveal.coordinate-overrides'
+
+function getMergedRoomConfig() {
+  try {
+    const rawOverrides = localStorage.getItem(COORD_OVERRIDE_STORAGE_KEY)
+    if (!rawOverrides) {
+      return roomConfig
+    }
+
+    const overrides = JSON.parse(rawOverrides)
+    const merged = JSON.parse(JSON.stringify(roomConfig))
+
+    for (const [residenceId, value] of Object.entries(overrides || {})) {
+      if (!merged[residenceId]) {
+        continue
+      }
+
+      if (Number.isFinite(value?.latitude)) {
+        merged[residenceId].latitude = value.latitude
+      }
+
+      if (Number.isFinite(value?.longitude)) {
+        merged[residenceId].longitude = value.longitude
+      }
+    }
+
+    return merged
+  } catch {
+    return roomConfig
+  }
+}
+
+const activeRoomConfig = getMergedRoomConfig()
+
 const app = document.querySelector('#app')
 app.innerHTML = `
   <div id="landing-page">
@@ -34,7 +68,7 @@ const state = {
   selectedRoomType: null,
 }
 
-const residences = Object.entries(roomConfig)
+const residences = Object.entries(activeRoomConfig)
 
 const residencePods = document.getElementById('residence-pods')
 const roomTypeStage = document.getElementById('room-type-stage')
@@ -73,7 +107,7 @@ function renderResidencePods() {
         state.selectedResidenceId = id
         state.selectedRoomType = null
 
-        const residence = roomConfig[id]
+        const residence = activeRoomConfig[id]
         const hasCoords = Number.isFinite(residence?.latitude) && Number.isFinite(residence?.longitude)
 
         if (hasCoords) {
@@ -101,7 +135,7 @@ function renderRoomTypePods() {
     return
   }
 
-  const roomTypes = roomConfig[residenceId]['room-types'] || []
+  const roomTypes = activeRoomConfig[residenceId]['room-types'] || []
   const selectedRoom = state.selectedRoomType
 
   roomTypeStage.classList.remove('is-hidden')
