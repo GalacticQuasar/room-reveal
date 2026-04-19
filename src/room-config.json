@@ -155,11 +155,6 @@
     "latitude": 40.4269878,
     "longitude": -86.9246771
   },
-  "south-hall": {
-    "room-types": [],
-    "latitude": 40.4245,
-    "longitude": -86.922
-  },
   "tarkington": {
     "room-types": [
       "Triple",
