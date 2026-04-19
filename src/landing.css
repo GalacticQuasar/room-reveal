@@ -67,6 +67,12 @@ body {
   padding: 1rem 1.5rem;
 }
 
+.landing-actions {
+  pointer-events: auto;
+  display: flex;
+  gap: 0.6rem;
+}
+
 .landing-title {
   margin: 0;
   font-size: 2rem;
@@ -85,7 +91,6 @@ body {
 }
 
 .launch-btn {
-  pointer-events: auto;
   border: none;
   border-radius: 8px;
   padding: 0.6rem 1.5rem;
@@ -108,6 +113,19 @@ body {
   background: #2f4a68;
 }
 
+.launch-btn.ghost {
+  border: 1px solid rgba(241, 240, 240, 0.28);
+  background: rgba(20, 20, 20, 0.72);
+}
+
+.launch-btn.ghost:hover {
+  background: rgba(20, 20, 20, 0.86);
+}
+
+.launch-btn.ghost:active {
+  background: rgba(20, 20, 20, 0.98);
+}
+
 .landing-hint {
   text-align: center;
   font-size: 0.9rem;
@@ -124,6 +142,11 @@ body {
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem;
+  }
+
+  .landing-actions {
+    width: 100%;
+    flex-direction: column;
   }
 
   .landing-title {

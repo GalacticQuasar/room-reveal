@@ -8,7 +8,10 @@ app.innerHTML = `
     <div class="landing-overlay">
       <header class="landing-header">
         <h1 class="landing-title"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
-        <button id="launch-viewer" class="launch-btn" type="button">Launch Viewer</button>
+        <div class="landing-actions">
+          <button id="open-select" class="launch-btn" type="button">Browse Splats</button>
+          <button id="open-upload" class="launch-btn ghost" type="button">Upload Video</button>
+        </div>
       </header>
       <p class="landing-hint">Explore Purdue campus in 3D. Select a building to view its rooms.</p>
     </div>
@@ -28,8 +31,12 @@ const map = new maplibregl.Map({
 
 map.addControl(new maplibregl.NavigationControl())
 
-document.getElementById('launch-viewer').addEventListener('click', () => {
-  window.location.href = '/viewer.html'
+document.getElementById('open-select').addEventListener('click', () => {
+  window.location.href = '/select.html'
+})
+
+document.getElementById('open-upload').addEventListener('click', () => {
+  window.location.href = '/upload.html'
 })
 
 map.on('load', () => {

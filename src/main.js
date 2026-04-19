@@ -2,6 +2,12 @@ import './style.css'
 import * as THREE from 'three'
 import { SplatFileType, SplatMesh } from '@sparkjsdev/spark'
 import startPositions from './start-positions.json'
+import { apiUrl } from './api'
+
+const params = new URLSearchParams(window.location.search)
+const building = params.get('building')
+const roomType = params.get('room_type')
+const splatId = params.get('splat_id')
 
 const app = document.querySelector('#app')
 app.innerHTML = `
@@ -9,17 +15,13 @@ app.innerHTML = `
     <canvas id="viewport"></canvas>
     <aside class="hud">
       <h1>Spark Gaussian Splat Viewer</h1>
-      <p class="hint">Load a .ply splat, click the scene, then roam with WASD + mouse.</p>
-      <label class="upload">
-        <input id="plyInput" type="file" accept=".ply" />
-        <span>Load PLY</span>
-      </label>
+      <p class="hint">Click the scene, then roam with WASD + mouse.</p>
       <label class="toggle">
         <input id="flip90Toggle" type="checkbox" />
-        <span>Flip 90° (Nerfstudio)</span>
+        <span>Flip 90deg (Nerfstudio)</span>
       </label>
       <button id="logCoordsBtn" class="secondary-btn" type="button" disabled>Log current position</button>
-      <p id="status">Waiting for file...</p>
+      <p id="status">Preparing viewer...</p>
       <div class="controls">
         <p><strong>Move:</strong> W A S D</p>
         <p><strong>Up / Down:</strong> Space / C</p>
@@ -32,7 +34,6 @@ app.innerHTML = `
 `
 
 const canvas = document.querySelector('#viewport')
-const input = document.querySelector('#plyInput')
 const status = document.querySelector('#status')
 const logCoordsBtn = document.querySelector('#logCoordsBtn')
 const flip90Toggle = document.querySelector('#flip90Toggle')
@@ -117,23 +118,35 @@ function buildPositionJsonEntry(fileName, position) {
   return `"${fileName}": ${JSON.stringify(coords)}`
 }
 
-async function loadPlyFile(file) {
+async function loadPlyFromRemote() {
+  if (!building || !roomType || !splatId) {
+    setStatus('Missing splat query parameters. Use the select page first.', true)
+    return
+  }
+
+  const fileName = `${splatId}.ply`
   try {
-    setStatus(`Loading ${file.name}...`)
+    setStatus(`Loading ${fileName}...`)
+
+    const url = apiUrl(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}/${encodeURIComponent(fileName)}`)
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`Unable to fetch splat (${response.status})`)
+    }
+
+    const buffer = await response.arrayBuffer()
+    const fileBytes = new Uint8Array(buffer)
 
     if (activeSplat) {
       scene.remove(activeSplat)
       activeSplat.dispose()
       activeSplat = null
     }
-    activeFileName = ''
-    logCoordsBtn.disabled = true
 
-    const fileBytes = new Uint8Array(await file.arrayBuffer())
     const splat = new SplatMesh({
       fileBytes,
       fileType: SplatFileType.PLY,
-      fileName: file.name,
+      fileName,
       maxSplats: 4_000_000,
     })
 
@@ -143,7 +156,7 @@ async function loadPlyFile(file) {
     activeSplat = splat
 
     const center = new THREE.Vector3(0, 0, 0)
-    const hardcodedStart = getHardcodedStartPosition(file.name)
+    const hardcodedStart = getHardcodedStartPosition(fileName)
 
     if (
       hardcodedStart &&
@@ -157,25 +170,18 @@ async function loadPlyFile(file) {
       camera.position.copy(center)
     }
 
-    activeFileName = file.name
+    activeFileName = fileName
     logCoordsBtn.disabled = false
-    setStatus(`Loaded ${file.name}. Click inside the scene to lock pointer and fly.`)
+    setStatus(`Loaded ${fileName}. Click inside the scene to lock pointer and fly.`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error while loading file'
     setStatus(`Failed to load PLY: ${message}`, true)
   }
 }
 
-input.addEventListener('change', (event) => {
-  const file = event.target.files?.[0]
-  if (file) {
-    void loadPlyFile(file)
-  }
-})
-
 logCoordsBtn.addEventListener('click', async () => {
   if (!activeSplat || !activeFileName) {
-    setStatus('Load a file before logging coordinates.', true)
+    setStatus('Splat is not loaded yet.', true)
     return
   }
 
@@ -187,18 +193,6 @@ logCoordsBtn.addEventListener('click', async () => {
     setStatus(`Logged start position for ${activeFileName}. Copied entry to clipboard.`)
   } catch {
     setStatus(`Logged start position for ${activeFileName}. Check the console output.`)
-  }
-})
-
-window.addEventListener('dragover', (event) => {
-  event.preventDefault()
-})
-
-window.addEventListener('drop', (event) => {
-  event.preventDefault()
-  const file = event.dataTransfer?.files?.[0]
-  if (file && file.name.toLowerCase().endsWith('.ply')) {
-    void loadPlyFile(file)
   }
 })
 
@@ -265,3 +259,5 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
+
+void loadPlyFromRemote()

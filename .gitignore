@@ -23,5 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# splats folder
-splats/
+# venv
+.venv/
+
+__pycache__/
+
+# env
+.env

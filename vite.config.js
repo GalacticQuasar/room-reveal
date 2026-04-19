@@ -12,6 +12,8 @@ export default defineConfig({
       input: {
         main: './index.html',
         viewer: './viewer.html',
+        upload: './upload.html',
+        select: './select.html',
       },
     },
   },

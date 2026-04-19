@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --content: #f1f0f0;
+  --content-muted: rgba(241, 240, 240, 0.72);
+  --primary: #456990;
+  --accent: #fa6559;
+  --bg: #141414;
+  --panel: rgba(20, 20, 20, 0.84);
+  --border: rgba(69, 105, 144, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--content);
+  background:
+    radial-gradient(circle at 15% 12%, rgba(69, 105, 144, 0.24), transparent 38%),
+    radial-gradient(circle at 90% 84%, rgba(250, 101, 89, 0.14), transparent 33%),
+    var(--bg);
+}
+
+.screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+}
+
+.card {
+  width: min(620px, 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-head h1 {
+  margin: 0;
+  font-family: 'Cardo', serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.back-link {
+  color: var(--content);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border: 1px solid rgba(241, 240, 240, 0.25);
+  border-radius: 999px;
+  padding: 0.42rem 0.88rem;
+}
+
+.back-link:hover {
+  background: rgba(241, 240, 240, 0.09);
+}
+
+.sub {
+  margin: 0.65rem 0 1rem;
+  color: var(--content-muted);
+}
+
+.form {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field span {
+  font-weight: 600;
+}
+
+.field small {
+  color: var(--content-muted);
+  font-size: 0.8rem;
+}
+
+select,
+input[type='file'] {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--content);
+  font-family: inherit;
+  padding: 0.58rem 0.65rem;
+}
+
+button[type='submit'] {
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--content);
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+button[type='submit']:hover:enabled {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+button[type='submit']:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.status {
+  margin: 1rem 0 0;
+  color: #7be7b2;
+  line-height: 1.45;
+}
+
+.status.error {
+  color: var(--accent);
+}
+
+.api {
+  margin: 0.6rem 0 0;
+  color: var(--content-muted);
+  font-size: 0.78rem;
+}
+
+.api code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
