@@ -66,9 +66,13 @@ app.innerHTML = `
 const state = {
   selectedResidenceId: null,
   selectedRoomType: null,
+  isResidenceExpanded: false,
+  isRoomTypeExpanded: false,
 }
 
-const residences = Object.entries(activeRoomConfig)
+const residences = Object.entries(activeRoomConfig).sort(([residenceA], [residenceB]) =>
+  toDisplayName(residenceA).localeCompare(toDisplayName(residenceB), undefined, { sensitivity: 'base' })
+)
 
 const residencePods = document.getElementById('residence-pods')
 const roomTypeStage = document.getElementById('room-type-stage')
@@ -91,21 +95,86 @@ function createPodButton(text, isSelected, onClick) {
   return button
 }
 
+function capturePodSnapshot(container) {
+  const snapshot = new Map()
+  container.querySelectorAll('.pod').forEach((pod) => {
+    const podId = pod.dataset.podId
+    if (!podId) {
+      return
+    }
+
+    const rect = pod.getBoundingClientRect()
+    snapshot.set(podId, {
+      top: rect.top,
+      left: rect.left,
+    })
+  })
+  return snapshot
+}
+
+function animatePodTransition(container, previousSnapshot) {
+  container.querySelectorAll('.pod').forEach((pod) => {
+    const podId = pod.dataset.podId
+    const previous = podId ? previousSnapshot.get(podId) : null
+
+    if (!previous) {
+      pod.animate(
+        [
+          { opacity: 0, transform: 'translateY(12px) scale(0.98)' },
+          { opacity: 1, transform: 'translateY(0) scale(1)' },
+        ],
+        {
+          duration: 420,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'both',
+        }
+      )
+      return
+    }
+
+    const nextRect = pod.getBoundingClientRect()
+    const dx = previous.left - nextRect.left
+    const dy = previous.top - nextRect.top
+
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+      return
+    }
+
+    const isSelected = pod.classList.contains('is-selected')
+    pod.animate(
+      [
+        { transform: `translate(${dx}px, ${dy}px)` },
+        { transform: 'translate(0, 0)' },
+      ],
+      {
+        duration: isSelected ? 740 : 560,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'both',
+      }
+    )
+  })
+}
+
 function renderResidencePods() {
   const selectedId = state.selectedResidenceId
-  const items = selectedId
-    ? residences.filter(([id]) => id === selectedId)
-    : residences
+  const shouldShowAll = !selectedId || state.isResidenceExpanded
+  const items = shouldShowAll
+    ? residences
+    : residences.filter(([id]) => id === selectedId)
 
   residencePods.replaceChildren(
     ...items.map(([id]) =>
       createPodButton(toDisplayName(id), id === selectedId, () => {
         if (id === state.selectedResidenceId) {
+          state.isResidenceExpanded = !state.isResidenceExpanded
+          renderSelectionState()
           return
         }
 
         state.selectedResidenceId = id
         state.selectedRoomType = null
+        state.isResidenceExpanded = false
+        state.isRoomTypeExpanded = false
 
         const residence = activeRoomConfig[id]
         const hasCoords = Number.isFinite(residence?.latitude) && Number.isFinite(residence?.longitude)
@@ -125,6 +194,10 @@ function renderResidencePods() {
       })
     )
   )
+
+  residencePods.querySelectorAll('.pod').forEach((pod, index) => {
+    pod.dataset.podId = items[index]?.[0] || ''
+  })
 }
 
 function renderRoomTypePods() {
@@ -135,7 +208,9 @@ function renderRoomTypePods() {
     return
   }
 
-  const roomTypes = activeRoomConfig[residenceId]['room-types'] || []
+  const roomTypes = [...(activeRoomConfig[residenceId]['room-types'] || [])].sort((roomTypeA, roomTypeB) =>
+    roomTypeA.localeCompare(roomTypeB, undefined, { sensitivity: 'base' })
+  )
   const selectedRoom = state.selectedRoomType
 
   roomTypeStage.classList.remove('is-hidden')
@@ -148,24 +223,44 @@ function renderRoomTypePods() {
     return
   }
 
-  const visibleRoomTypes = selectedRoom ? roomTypes.filter((room) => room === selectedRoom) : roomTypes
+  const shouldShowAll = !selectedRoom || state.isRoomTypeExpanded
+  const visibleRoomTypes = shouldShowAll ? roomTypes : roomTypes.filter((room) => room === selectedRoom)
 
   roomTypePods.replaceChildren(
     ...visibleRoomTypes.map((roomType) =>
       createPodButton(roomType, roomType === selectedRoom, () => {
+        if (roomType === state.selectedRoomType) {
+          state.isRoomTypeExpanded = !state.isRoomTypeExpanded
+          renderSelectionState()
+          return
+        }
+
         state.selectedRoomType = roomType
+        state.isRoomTypeExpanded = false
         renderSelectionState()
       })
     )
   )
+
+  roomTypePods.querySelectorAll('.pod').forEach((pod, index) => {
+    pod.dataset.podId = visibleRoomTypes[index] || ''
+  })
 }
 
 function renderSelectionState() {
+  const residenceSnapshot = capturePodSnapshot(residencePods)
+  const roomTypeSnapshot = capturePodSnapshot(roomTypePods)
+
   renderResidencePods()
   renderRoomTypePods()
 
   const readyToExplore = Boolean(state.selectedResidenceId && state.selectedRoomType)
   exploreBtn.classList.toggle('is-hidden', !readyToExplore)
+
+  requestAnimationFrame(() => {
+    animatePodTransition(residencePods, residenceSnapshot)
+    animatePodTransition(roomTypePods, roomTypeSnapshot)
+  })
 }
 
 const map = new maplibregl.Map({

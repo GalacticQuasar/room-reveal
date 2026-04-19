@@ -94,10 +94,21 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  max-height: 3200px;
+  opacity: 1;
+  transform: translateY(0);
+  overflow: visible;
+  flex-shrink: 0;
+  transition: max-height 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .selection-stage.is-hidden {
-  display: none;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .stage-label {
@@ -127,7 +138,8 @@ body {
   font-size: 0.89rem;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 140ms ease, transform 180ms ease, background-color 140ms ease, box-shadow 180ms ease;
+  transition: border-color 220ms ease, transform 280ms ease, background-color 220ms ease, box-shadow 280ms ease;
+  will-change: transform, opacity;
 }
 
 .pod:hover {
@@ -145,19 +157,12 @@ body {
   border-color: rgba(69, 105, 144, 0.9);
   background: linear-gradient(90deg, rgba(69, 105, 144, 0.28), rgba(69, 105, 144, 0.1));
   box-shadow: 0 8px 18px rgba(69, 105, 144, 0.24);
-  transform: translateY(-3px);
-  animation: float-up 260ms ease;
 }
 
-@keyframes float-up {
-  from {
-    opacity: 0.7;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(-3px);
-  }
+#room-type-pods .pod.is-selected {
+  border-color: rgba(250, 101, 89, 0.9);
+  background: linear-gradient(90deg, rgba(250, 101, 89, 0.3), rgba(250, 101, 89, 0.12));
+  box-shadow: 0 8px 18px rgba(250, 101, 89, 0.28);
 }
 
 .room-type-empty {
@@ -173,6 +178,7 @@ body {
   flex-direction: column;
   gap: 0.58rem;
   padding-top: 0.7rem;
+  flex-shrink: 0;
 }
 
 .cta-btn,
@@ -188,24 +194,29 @@ body {
 }
 
 .cta-btn {
-  background: var(--primary);
+  background: rgba(241, 240, 240, 0.06);
+  border-color: var(--surface-2);
   color: var(--content);
 }
 
 .cta-btn:hover {
   transform: translateY(-1px);
-  filter: brightness(1.07);
+  border-color: var(--surface-3);
+  background: rgba(241, 240, 240, 0.1);
+  filter: none;
 }
 
 .ghost-btn {
   border-color: var(--surface-2);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(241, 240, 240, 0.06);
   color: var(--content);
 }
 
 .ghost-btn:hover {
   transform: translateY(-1px);
   border-color: var(--surface-3);
+  background: rgba(241, 240, 240, 0.1);
+  filter: none;
 }
 
 .cta-btn.is-hidden {
