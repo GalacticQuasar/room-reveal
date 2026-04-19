@@ -72,6 +72,13 @@ body {
   padding: clamp(1.1rem, 2.4vw, 1.6rem);
   gap: 1rem;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.left-panel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .panel-logo {
