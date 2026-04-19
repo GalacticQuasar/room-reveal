@@ -110,9 +110,10 @@ body {
 .panel-logo {
   margin: 0;
   font-family: 'Cardo', serif;
-  font-size: clamp(0.75rem, 10.5vw, 47px);
+  font-size: clamp(0.75rem, 10.5vw, 50px);
   letter-spacing: -0.02em;
   line-height: 1.05;
+  font-weight: 400;
 }
 
 .panel-logo .primary {
