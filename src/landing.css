@@ -62,6 +62,10 @@ body {
   pointer-events: none;
 }
 
+#header-icon:hover {
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.65));
+}
+
 #map-container {
   width: 100%;
   height: 100%;
@@ -419,6 +423,108 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.about-modal-card {
+  width: min(520px, calc(100% - 1.5rem));
+  position: relative;
+}
+
+.about-modal-card > .upload-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.about-modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+#about-modal-logo {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  transform: scale(1.14);
+  transform-origin: center;
+}
+
+.about-modal-logo-frame {
+  width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.about-modal-description {
+  margin: 0;
+  color: var(--content-muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.about-modal-developers {
+  width: 100%;
+  border-top: 1px solid var(--surface-2);
+  padding-top: 1rem;
+  text-align: left;
+}
+
+.about-modal-developer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.about-modal-developer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.about-modal-developer-name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.about-modal-developer-links {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.about-modal-developer-links a {
+  color: var(--content-muted);
+  transition: color 140ms ease;
+}
+
+.about-modal-developer-links a:hover {
+  color: var(--content);
+}
+
+.about-modal-developer-links svg {
+  width: 28px;
+  height: 28px;
+}
+
+.about-modal-developers h3 {
+  margin: 0 0 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--content-muted);
+  text-align: center;
+}
+
+.about-modal-developers p {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .no-scans-modal-card {
