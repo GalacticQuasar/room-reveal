@@ -299,6 +299,8 @@ async function loadSplatByIndex(nextIndex) {
       camera.lookAt(center)
     }
 
+    euler.setFromQuaternion(camera.quaternion, 'YXZ')
+
     currentSplatIndex = nextIndex
     hasLoadedSplat = true
     await finishLoadingOverlaySuccess()
@@ -366,7 +368,13 @@ document.addEventListener('mousemove', (event) => {
     return
   }
 
-  euler.setFromQuaternion(camera.quaternion)
+  // If Chrome reports a physically impossible mouse movement in a single event,
+  // it's the Pointer Lock bug. Ignore this event entirely.
+  const movementThreshold = 150; 
+  if (Math.abs(event.movementX) > movementThreshold || Math.abs(event.movementY) > movementThreshold) {
+    return;
+  }
+
   euler.y -= event.movementX * lookSensitivity
   euler.x -= event.movementY * lookSensitivity
   euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x))
