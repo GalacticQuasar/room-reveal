@@ -94,7 +94,7 @@ body {
 .panel-logo {
   margin: 0;
   font-family: 'Cardo', serif;
-  font-size: clamp(0.75rem, 10.5vw, 2.996rem);
+  font-size: clamp(0.75rem, 10.5vw, 47px);
   letter-spacing: -0.02em;
   line-height: 1.05;
 }
