@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Cardo:wght@400;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
 
 :root {
-  --content: #f1f0f0;
-  --content-muted: rgba(241, 240, 240, 0.6);
-  --primary: #456990;
-  --accent: #fa6559;
-  --panel: rgba(20, 20, 20, 0.85);
-  --panel-border: rgba(69, 105, 144, 0.4);
-  --bg1: #141414;
-  --bg2: #1e1e1e;
-  --bg3: #456990;
+  --surface-1: rgba(7, 7, 10, 0.82);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --surface-3: rgba(255, 255, 255, 0.14);
+  --content: #f4f4f5;
+  --content-muted: #a1a1aa;
+  --brand: #67a5ff;
+  --brand-active: #8cb9ff;
+  --accent: #ff7a55;
+  --shadow: 0 24px 48px rgba(0, 0, 0, 0.34);
 }
 
 * {
@@ -27,9 +27,11 @@ body,
 }
 
 body {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--content);
   overflow: hidden;
+  background: radial-gradient(circle at 15% 20%, rgba(103, 165, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 85% 85%, rgba(255, 122, 85, 0.14), transparent 30%), #09090b;
 }
 
 #landing-page {
@@ -47,113 +49,191 @@ body {
   display: none !important;
 }
 
-.landing-overlay {
+.panel-frame {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: min(390px, 100%);
   height: 100%;
-  pointer-events: none;
-  z-index: 1;
+  pointer-events: auto;
+  padding: clamp(1rem, 2.2vw, 1.75rem);
+  z-index: 2;
+}
+
+.left-panel {
+  height: 100%;
+  border: 1px solid var(--surface-2);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(13, 13, 16, 0.86), rgba(9, 9, 11, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  gap: 1rem;
+  overflow-y: auto;
 }
 
-.landing-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-}
-
-.landing-actions {
-  pointer-events: auto;
-  display: flex;
-  gap: 0.6rem;
-}
-
-.landing-title {
+.panel-logo {
   margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #fff;
-  font-family: 'Cardo', serif;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.55rem, 3vw, 1.85rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
-.landing-title .primary {
-  color: var(--primary);
+.panel-logo .primary {
+  color: var(--brand);
 }
 
-.landing-title .accent {
+.panel-logo .accent {
   color: var(--accent);
 }
 
-.launch-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 0.6rem 1.5rem;
-  background: var(--primary);
+.selection-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.selection-stage.is-hidden {
+  display: none;
+}
+
+.stage-label {
+  margin: 0;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--content-muted);
+  font-weight: 600;
+}
+
+.pod-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pod {
+  width: 100%;
+  border: 1px solid var(--surface-2);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--content);
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.95rem;
+  border-radius: 999px;
+  padding: 0.62rem 0.9rem;
+  text-align: left;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.89rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 140ms ease, transform 180ms ease, background-color 140ms ease, box-shadow 180ms ease;
+}
+
+.pod:hover {
+  border-color: var(--surface-3);
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pod:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.pod.is-selected {
+  border-color: rgba(140, 185, 255, 0.8);
+  background: linear-gradient(90deg, rgba(103, 165, 255, 0.2), rgba(103, 165, 255, 0.07));
+  box-shadow: 0 8px 18px rgba(103, 165, 255, 0.2);
+  transform: translateY(-3px);
+  animation: float-up 260ms ease;
+}
+
+@keyframes float-up {
+  from {
+    opacity: 0.7;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.room-type-empty {
+  margin: 0;
+  padding: 0.25rem 0.1rem;
+  color: var(--content-muted);
+  font-size: 0.86rem;
+}
+
+.panel-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.58rem;
+  padding-top: 0.7rem;
+}
+
+.cta-btn,
+.ghost-btn {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0.73rem 0.95rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 120ms ease, background-color 120ms ease;
+  transition: transform 140ms ease, filter 140ms ease, border-color 140ms ease;
 }
 
-.launch-btn:hover {
+.cta-btn {
+  background: var(--brand);
+  color: #0a0a0a;
+}
+
+.cta-btn:hover {
   transform: translateY(-1px);
-  background: #3a5779;
+  filter: brightness(1.07);
 }
 
-.launch-btn:active {
-  transform: translateY(0);
-  background: #2f4a68;
+.ghost-btn {
+  border-color: var(--surface-2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--content);
 }
 
-.launch-btn.ghost {
-  border: 1px solid rgba(241, 240, 240, 0.28);
-  background: rgba(20, 20, 20, 0.72);
+.ghost-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--surface-3);
 }
 
-.launch-btn.ghost:hover {
-  background: rgba(20, 20, 20, 0.86);
-}
-
-.launch-btn.ghost:active {
-  background: rgba(20, 20, 20, 0.98);
-}
-
-.landing-hint {
-  text-align: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #fff;
-  pointer-events: none;
-  letter-spacing: 0.02em;
-  opacity: 0.7;
-  padding: 0 1.5rem 1.5rem;
+.cta-btn.is-hidden {
+  display: none;
 }
 
 @media (max-width: 600px) {
-  .landing-header {
-    flex-direction: column;
-    gap: 0.75rem;
+  .panel-frame {
+    width: 100%;
+    height: auto;
+    max-height: 62vh;
+    top: auto;
+    bottom: 0;
+    padding: 0.75rem;
+  }
+
+  .left-panel {
+    border-radius: 20px 20px 0 0;
     padding: 1rem;
+    gap: 0.8rem;
   }
 
-  .landing-actions {
-    width: 100%;
-    flex-direction: column;
+  .pod {
+    font-size: 0.86rem;
+    padding: 0.58rem 0.82rem;
   }
 
-  .landing-title {
-    font-size: 1.25rem;
-  }
-
-  .launch-btn {
-    width: 100%;
+  .panel-actions {
+    padding-top: 0.45rem;
   }
 }

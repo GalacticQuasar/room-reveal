@@ -1,22 +1,138 @@
 import './landing.css'
 import maplibregl from 'maplibre-gl'
+import roomConfig from './room-config.json'
 
 const app = document.querySelector('#app')
 app.innerHTML = `
   <div id="landing-page">
     <div id="map-container"></div>
-    <div class="landing-overlay">
-      <header class="landing-header">
-        <h1 class="landing-title"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
-        <div class="landing-actions">
-          <button id="open-select" class="launch-btn" type="button">Browse Splats</button>
-          <button id="open-upload" class="launch-btn ghost" type="button">Upload Video</button>
+    <div class="panel-frame">
+      <aside class="left-panel" aria-label="Residence and room type selector">
+        <h1 class="panel-logo"><span class="primary">Room</span> <span class="accent">Reveal</span></h1>
+
+        <div class="selection-stage">
+          <p class="stage-label">Select Residence</p>
+          <div id="residence-pods" class="pod-list" role="list"></div>
         </div>
-      </header>
-      <p class="landing-hint">Explore Purdue campus in 3D. Select a building to view its rooms.</p>
+
+        <div id="room-type-stage" class="selection-stage is-hidden" aria-live="polite">
+          <p class="stage-label">Select Room Type</p>
+          <div id="room-type-pods" class="pod-list" role="list"></div>
+        </div>
+
+        <div class="panel-actions">
+          <button id="explore-room" class="cta-btn is-hidden" type="button">Explore Room</button>
+          <button id="open-upload" class="ghost-btn" type="button">Upload Video</button>
+        </div>
+      </aside>
     </div>
   </div>
 `
+
+const state = {
+  selectedResidenceId: null,
+  selectedRoomType: null,
+}
+
+const residences = Object.entries(roomConfig)
+
+const residencePods = document.getElementById('residence-pods')
+const roomTypeStage = document.getElementById('room-type-stage')
+const roomTypePods = document.getElementById('room-type-pods')
+const exploreBtn = document.getElementById('explore-room')
+
+function toDisplayName(value) {
+  return value
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+function createPodButton(text, isSelected, onClick) {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.className = `pod${isSelected ? ' is-selected' : ''}`
+  button.textContent = text
+  button.addEventListener('click', onClick)
+  return button
+}
+
+function renderResidencePods() {
+  const selectedId = state.selectedResidenceId
+  const items = selectedId
+    ? residences.filter(([id]) => id === selectedId)
+    : residences
+
+  residencePods.replaceChildren(
+    ...items.map(([id]) =>
+      createPodButton(toDisplayName(id), id === selectedId, () => {
+        if (id === state.selectedResidenceId) {
+          return
+        }
+
+        state.selectedResidenceId = id
+        state.selectedRoomType = null
+
+        const residence = roomConfig[id]
+        const hasCoords = Number.isFinite(residence?.latitude) && Number.isFinite(residence?.longitude)
+
+        if (hasCoords) {
+          map.flyTo({
+            center: [residence.longitude, residence.latitude],
+            zoom: 17.4,
+            pitch: 55,
+            bearing: -25,
+            duration: 1700,
+            essential: true,
+          })
+        }
+
+        renderSelectionState()
+      })
+    )
+  )
+}
+
+function renderRoomTypePods() {
+  const residenceId = state.selectedResidenceId
+  if (!residenceId) {
+    roomTypeStage.classList.add('is-hidden')
+    roomTypePods.replaceChildren()
+    return
+  }
+
+  const roomTypes = roomConfig[residenceId]['room-types'] || []
+  const selectedRoom = state.selectedRoomType
+
+  roomTypeStage.classList.remove('is-hidden')
+
+  if (roomTypes.length === 0) {
+    const noRooms = document.createElement('p')
+    noRooms.className = 'room-type-empty'
+    noRooms.textContent = 'No room types listed yet.'
+    roomTypePods.replaceChildren(noRooms)
+    return
+  }
+
+  const visibleRoomTypes = selectedRoom ? roomTypes.filter((room) => room === selectedRoom) : roomTypes
+
+  roomTypePods.replaceChildren(
+    ...visibleRoomTypes.map((roomType) =>
+      createPodButton(roomType, roomType === selectedRoom, () => {
+        state.selectedRoomType = roomType
+        renderSelectionState()
+      })
+    )
+  )
+}
+
+function renderSelectionState() {
+  renderResidencePods()
+  renderRoomTypePods()
+
+  const readyToExplore = Boolean(state.selectedResidenceId && state.selectedRoomType)
+  exploreBtn.classList.toggle('is-hidden', !readyToExplore)
+}
 
 const map = new maplibregl.Map({
   container: 'map-container',
@@ -31,12 +147,12 @@ const map = new maplibregl.Map({
 
 map.addControl(new maplibregl.NavigationControl())
 
-document.getElementById('open-select').addEventListener('click', () => {
-  window.location.href = '/select.html'
-})
-
 document.getElementById('open-upload').addEventListener('click', () => {
   window.location.href = '/upload.html'
+})
+
+exploreBtn.addEventListener('click', () => {
+  // Intentionally no-op until explore flow is wired.
 })
 
 map.on('load', () => {
@@ -61,4 +177,6 @@ map.on('load', () => {
       'fill-extrusion-opacity': 0.8,
     },
   })
+
+  renderSelectionState()
 })
