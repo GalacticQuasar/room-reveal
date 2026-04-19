@@ -1,7 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
 import { SplatFileType, SplatMesh } from '@sparkjsdev/spark'
-import startPositions from './start-positions.json'
 import { apiUrl, fetchJson } from './api'
 
 const params = new URLSearchParams(window.location.search)
@@ -78,29 +77,13 @@ const lookRight = new THREE.Vector3()
 const clock = new THREE.Clock()
 
 const lookSensitivity = 0.0018
-const baseSpeed = 1
+const baseSpeed = 0.75
 const boostMultiplier = 2
 
 function applySplatOrientation(splat) {
   if (!splat) return
   splat.rotation.x = -Math.PI / 2
   splat.rotation.z = Math.PI
-}
-
-function getHardcodedStartPosition(fileName) {
-  if (!fileName) return null
-
-  const exact = startPositions[fileName]
-  if (exact) return exact
-
-  const lowerName = fileName.toLowerCase()
-  for (const [key, coords] of Object.entries(startPositions)) {
-    if (key.toLowerCase() === lowerName) {
-      return coords
-    }
-  }
-
-  return null
 }
 
 function normalizeSplatId(value) {
@@ -283,23 +266,7 @@ async function loadSplatByIndex(nextIndex) {
       previousSplat.dispose()
     }
 
-    const center = new THREE.Vector3(0, 0, 0)
-    const hardcodedStart = getHardcodedStartPosition(fileName)
-
-    if (
-      hardcodedStart &&
-      Number.isFinite(hardcodedStart.x) &&
-      Number.isFinite(hardcodedStart.y) &&
-      Number.isFinite(hardcodedStart.z)
-    ) {
-      camera.position.set(hardcodedStart.x, hardcodedStart.y, hardcodedStart.z)
-      camera.lookAt(center)
-    } else {
-      camera.position.copy(center)
-      camera.lookAt(center)
-    }
-
-    euler.setFromQuaternion(camera.quaternion, 'YXZ')
+    recenterCamera()
 
     currentSplatIndex = nextIndex
     hasLoadedSplat = true

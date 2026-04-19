@@ -26,8 +26,7 @@ High-signal notes for OpenCode sessions in this repo.
 - Viewer fetch path is `/splats/{building}/{room_type}/{splatId}.ply` via `apiUrl(...)`.
 - Preserve splat replacement/disposal on reload (`scene.remove(activeSplat)` + `activeSplat.dispose()`) to avoid leaks.
 - Orientation is controlled by `Flip 90deg (Nerfstudio)` toggle (`applySplatOrientation`); default is no rotation.
-- Start positions are looked up in `src/start-positions.json` by exact then case-insensitive filename.
-- `Log current position` writes `[START_POSITION_ENTRY]` to console and tries clipboard copy.
+- Viewer start position is always reset to origin (`camera.position = (0, 0, 0)`) when a splat loads.
 
 ## Data/config boundaries that are easy to confuse
 
