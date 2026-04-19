@@ -22,7 +22,7 @@ app = modal.App("room-reveal")
 volume = modal.Volume.from_name("room-reveal-splats", create_if_missing=True)
 cache_volume = modal.Volume.from_name("room-reveal-cache", create_if_missing=True)
 
-image = (
+pipeline_image = (
     modal.Image.from_registry(
         "ghcr.io/nerfstudio-project/nerfstudio:latest",
         add_python="3.11",
@@ -30,6 +30,8 @@ image = (
     .pip_install("fastapi[standard]==0.115.6")
     .add_local_file("pipeline/pipeline.sh", remote_path="/workspace/pipeline.sh")
 )
+
+web_image = modal.Image.debian_slim(python_version="3.11").pip_install("fastapi[standard]==0.115.6")
 
 
 def _duration_seconds_from_file(video_path: Path) -> int:
@@ -94,7 +96,7 @@ def _release_slot(lock_path: str) -> None:
 
 
 @app.function(
-    image=image,
+    image=pipeline_image,
     gpu="A100",
     timeout=60 * 60,
     volumes={"/splats": volume, "/cache": cache_volume},
@@ -246,7 +248,7 @@ async def upload_video(
         raise
 
 
-@app.function(image=image, volumes={"/splats": volume})
+@app.function(image=web_image, volumes={"/splats": volume}, min_containers=1)
 @modal.asgi_app()
 def api():
     return web_app
