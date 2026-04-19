@@ -13,12 +13,16 @@ const app = document.querySelector('#app')
 app.innerHTML = `
   <div class="viewer-shell">
     <canvas id="viewport"></canvas>
+    <button id="exitViewer" class="viewer-action exit-viewer-btn" type="button" aria-label="Exit viewer">Exit Viewer</button>
     <aside id="controlsPod" class="controls-pod is-hidden" aria-label="Viewer controls">
       <p><strong>Move:</strong> WASD</p>
       <p><strong>Look:</strong> Mouse (click to lock)</p>
       <p><strong>Unlock:</strong> Esc</p>
       <p><strong>Switch:</strong> Arrow Left / Right</p>
     </aside>
+    <button id="recenterBtn" class="viewer-action recenter-btn is-hidden" type="button" aria-label="Re-center camera">
+      Re-center
+    </button>
     <section id="loadingOverlay" class="loading-overlay">
       <div class="loading-card">
         <p id="loadingTitle" class="loading-title">Preparing room...</p>
@@ -29,13 +33,15 @@ app.innerHTML = `
         <p id="loadingPercent" class="loading-percent">0%</p>
       </div>
     </section>
-    <button id="prevSplat" class="nav-arrow nav-arrow-left" type="button" aria-label="View previous splat">&#x2039;</button>
-    <button id="nextSplat" class="nav-arrow nav-arrow-right" type="button" aria-label="View next splat">&#x203A;</button>
+    <button id="prevSplat" class="nav-arrow nav-arrow-left" type="button" aria-label="View previous splat"><span class="nav-arrow-glyph" aria-hidden="true">&#x2039;</span></button>
+    <button id="nextSplat" class="nav-arrow nav-arrow-right" type="button" aria-label="View next splat"><span class="nav-arrow-glyph" aria-hidden="true">&#x203A;</span></button>
   </div>
 `
 
 const canvas = document.querySelector('#viewport')
+const exitViewerButton = document.querySelector('#exitViewer')
 const controlsPod = document.querySelector('#controlsPod')
+const recenterButton = document.querySelector('#recenterBtn')
 const loadingOverlay = document.querySelector('#loadingOverlay')
 const loadingTitle = document.querySelector('#loadingTitle')
 const loadingSubtitle = document.querySelector('#loadingSubtitle')
@@ -224,6 +230,13 @@ function updateArrowState() {
   nextSplatButton.disabled = !hasRight
 
   controlsPod.classList.toggle('is-hidden', !hasLoadedSplat)
+  recenterButton.classList.toggle('is-hidden', !hasLoadedSplat)
+}
+
+function recenterCamera() {
+  camera.position.set(0, 0, 0)
+  camera.quaternion.set(0, 0, 0, 1)
+  euler.set(0, 0, 0)
 }
 
 async function loadSplatByIndex(nextIndex) {
@@ -308,6 +321,10 @@ function goToNextSplat() {
 
 prevSplatButton.addEventListener('click', goToPreviousSplat)
 nextSplatButton.addEventListener('click', goToNextSplat)
+recenterButton.addEventListener('click', recenterCamera)
+exitViewerButton.addEventListener('click', () => {
+  window.location.href = '/'
+})
 
 document.addEventListener('keydown', (event) => {
   if (event.code === 'ArrowLeft' && document.pointerLockElement !== canvas) {
