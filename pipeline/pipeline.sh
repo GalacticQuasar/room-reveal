@@ -28,7 +28,7 @@ echo "END: COLMAP data extraction complete. Output saved to colmap/ directory."
 
 # Step 2: Train the Gaussian Splatting model with the extracted COLMAP data:
 echo "START: Training Gaussian Splatting model..."
-ns-train splatfacto --data colmap/ --max-num-iterations 15000 \
+ns-train splatfacto --data colmap/ --max-num-iterations 30000 \
     --viewer.quit-on-train-completion True \
     --machine.device-type cuda \
     --experiment-name my_splat \

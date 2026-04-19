@@ -95,7 +95,7 @@ def _release_slot(lock_path: str) -> None:
 
 @app.function(
     image=image,
-    gpu="A10G",
+    gpu="A100",
     timeout=60 * 60,
     volumes={"/splats": volume, "/cache": cache_volume},
 )
