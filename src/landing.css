@@ -223,6 +223,10 @@ body {
   display: none;
 }
 
+.ghost-btn.is-hidden {
+  display: none;
+}
+
 @media (max-width: 600px) {
   .panel-frame {
     width: 100%;

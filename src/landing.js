@@ -78,6 +78,7 @@ const residencePods = document.getElementById('residence-pods')
 const roomTypeStage = document.getElementById('room-type-stage')
 const roomTypePods = document.getElementById('room-type-pods')
 const exploreBtn = document.getElementById('explore-room')
+const uploadBtn = document.getElementById('open-upload')
 
 function toDisplayName(value) {
   return value
@@ -256,6 +257,7 @@ function renderSelectionState() {
 
   const readyToExplore = Boolean(state.selectedResidenceId && state.selectedRoomType)
   exploreBtn.classList.toggle('is-hidden', !readyToExplore)
+  uploadBtn.classList.toggle('is-hidden', !readyToExplore)
 
   requestAnimationFrame(() => {
     animatePodTransition(residencePods, residenceSnapshot)
