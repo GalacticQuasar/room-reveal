@@ -134,21 +134,30 @@ function startLoadingOverlay(fileName) {
   stopFakeProgressTimer()
   resetLoadingProgressState()
 
-  loadingTitle.textContent = `Loading ${fileName}`
-  loadingSubtitle.textContent = 'Preparing scene...'
+  loadingTitle.textContent = 'Loading 3D Gaussian Splat'
+  loadingSubtitle.textContent = `File: ${fileName}`
   loadingOverlay.classList.remove('is-error')
   loadingOverlay.classList.add('is-visible')
   renderLoadingProgress(0)
 
   const startAt = Date.now()
   const fakeDurationMs = 30_000
+  const postDurationIncrementMs = 5_000
 
   fakeProgressTimer = window.setInterval(() => {
     const elapsed = Date.now() - startAt
-    const t = Math.min(elapsed / fakeDurationMs, 1)
-    // Ease toward 92% over 30s while waiting for actual completion.
-    const eased = 1 - Math.pow(1 - t, 2)
-    fakeProgress = Math.max(fakeProgress, 92 * eased)
+    if (elapsed <= fakeDurationMs) {
+      const t = Math.min(elapsed / fakeDurationMs, 1)
+      // Ease toward 92% over 30s while waiting for actual completion.
+      const eased = 1 - Math.pow(1 - t, 2)
+      fakeProgress = Math.max(fakeProgress, 92 * eased)
+    } else {
+      const postDurationElapsed = elapsed - fakeDurationMs
+      const postDurationSteps = Math.floor(postDurationElapsed / postDurationIncrementMs)
+      const postDurationProgress = Math.min(92 + postDurationSteps, 99)
+      fakeProgress = Math.max(fakeProgress, postDurationProgress)
+    }
+
     renderLoadingProgress(Math.max(fakeProgress, realProgress))
   }, 100)
 }
@@ -159,13 +168,11 @@ function setRealProgress(fraction) {
   }
 
   realProgress = Math.max(realProgress, Math.min(fraction, 1) * 100)
-  loadingSubtitle.textContent = 'Downloading room scan...'
   renderLoadingProgress(Math.max(fakeProgress, realProgress))
 }
 
 async function finishLoadingOverlaySuccess() {
   stopFakeProgressTimer()
-  loadingSubtitle.textContent = 'Finalizing...'
   renderLoadingProgress(100)
   await new Promise((resolve) => window.setTimeout(resolve, 260))
   loadingOverlay.classList.remove('is-visible')
