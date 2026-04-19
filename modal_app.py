@@ -26,6 +26,7 @@ LOCK_STALE_AFTER_SECONDS = 60 * 60 * 6
 app = modal.App("room-reveal")
 
 volume = modal.Volume.from_name("room-reveal-splats", create_if_missing=True)
+cache_volume = modal.Volume.from_name("room-reveal-cache", create_if_missing=True)
 
 image = (
     modal.Image.from_registry(
@@ -110,7 +111,7 @@ def _release_slot(lock_path: str) -> None:
     image=image,
     gpu="A10G",
     timeout=60 * 60,
-    volumes={"/splats": volume},
+    volumes={"/splats": volume, "/root/.cache": cache_volume},
 )
 def run_pipeline_job(job_id: str, building: str, room_type: str, upload_path: str, lock_path: str) -> None:
     upload_video = Path(upload_path)
@@ -139,10 +140,12 @@ def run_pipeline_job(job_id: str, building: str, room_type: str, upload_path: st
 
         shutil.move(str(produced_file), str(final_path))
         volume.commit()
+        cache_volume.commit()
     finally:
         upload_video.unlink(missing_ok=True)
         _release_slot(lock_path)
         volume.commit()
+        cache_volume.commit()
         shutil.rmtree(temp_root, ignore_errors=True)
 
 
