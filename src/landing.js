@@ -110,6 +110,11 @@ app.innerHTML = `
         <button id="dismiss-no-scans-modal" class="cta-btn" type="button">Got it</button>
       </section>
     </div>
+
+    <div id="viewer-info" class="viewer-info">
+      <p>Left Click + Drag to move around</p>
+      <p>Right Click + Drag to change orientation</p>
+    </div>
   </div>
 `
 

@@ -521,6 +521,29 @@ body {
   color: var(--content-muted);
 }
 
+.viewer-info {
+  position: absolute;
+  bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+  right: clamp(0.75rem, 1.5vw, 1.25rem);
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--surface-2);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+
+.viewer-info p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--content-muted);
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .panel-frame {
     width: 100%;
