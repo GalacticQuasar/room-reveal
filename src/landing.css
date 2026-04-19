@@ -254,6 +254,27 @@ body {
   color: var(--content);
 }
 
+#explore-room {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.explore-btn-spinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 999px;
+  border: 2px solid rgba(241, 240, 240, 0.42);
+  border-top-color: rgba(241, 240, 240, 1);
+  animation: explore-spin 760ms linear infinite;
+  display: none;
+}
+
+#explore-room.is-loading .explore-btn-spinner {
+  display: inline-block;
+}
+
 .cta-btn:hover {
   transform: translateY(-1px);
   border-color: var(--surface-3);
@@ -280,6 +301,12 @@ body {
 
 .ghost-btn.is-hidden {
   display: none;
+}
+
+@keyframes explore-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .upload-modal {

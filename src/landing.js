@@ -59,10 +59,12 @@ app.innerHTML = `
         </div>
 
         <div class="panel-actions">
-          <button id="explore-room" class="cta-btn is-hidden" type="button">Explore Room</button>
+          <button id="explore-room" class="cta-btn is-hidden" type="button">
+            <span class="explore-btn-spinner" aria-hidden="true"></span>
+            <span id="explore-room-label">Explore Room</span>
+          </button>
           <button id="open-upload" class="ghost-btn" type="button">Upload Video</button>
         </div>
-        <p id="explore-status" class="explore-status" aria-live="polite"></p>
       </aside>
     </div>
 
@@ -124,8 +126,8 @@ const residencePods = document.getElementById('residence-pods')
 const roomTypeStage = document.getElementById('room-type-stage')
 const roomTypePods = document.getElementById('room-type-pods')
 const exploreBtn = document.getElementById('explore-room')
+const exploreBtnLabel = document.getElementById('explore-room-label')
 const uploadBtn = document.getElementById('open-upload')
-const exploreStatus = document.getElementById('explore-status')
 const landingPage = document.getElementById('landing-page')
 
 const uploadModal = document.getElementById('upload-modal')
@@ -151,11 +153,6 @@ let isUploading = false
 let uploadFakeProgress = 0
 let uploadRenderedProgress = 0
 let uploadProgressTimer = null
-
-function setExploreStatus(message, isError = false) {
-  exploreStatus.textContent = message
-  exploreStatus.classList.toggle('error', isError)
-}
 
 function setUploadStatus(message, isError = false) {
   uploadModalStatus.textContent = message
@@ -252,7 +249,6 @@ function openUploadModal() {
   const building = state.selectedResidenceId
   const roomType = state.selectedRoomType
   if (!building || !roomType) {
-    setExploreStatus('Please select a residence and room type before uploading.', true)
     return
   }
 
@@ -478,11 +474,9 @@ function renderSelectionState() {
   const readyToExplore = Boolean(state.selectedResidenceId && state.selectedRoomType)
   exploreBtn.classList.toggle('is-hidden', !readyToExplore)
   uploadBtn.classList.toggle('is-hidden', !readyToExplore)
-  if (!readyToExplore) {
-    setExploreStatus('')
-  }
   exploreBtn.disabled = !readyToExplore || isExploring
   exploreBtn.classList.toggle('is-loading', isExploring)
+  exploreBtnLabel.textContent = isExploring ? 'Fetching 3D Models...' : 'Explore Room'
 
   requestAnimationFrame(() => {
     animatePodTransition(residencePods, residenceSnapshot)
@@ -649,12 +643,10 @@ exploreBtn.addEventListener('click', async () => {
 
   isExploring = true
   renderSelectionState()
-  setExploreStatus('Finding first available room scan...')
 
   try {
     const splats = await fetchJson(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}`)
     if (!Array.isArray(splats) || splats.length === 0) {
-      setExploreStatus('')
       openNoScansModal()
       return
     }
@@ -665,7 +657,7 @@ exploreBtn.addEventListener('click', async () => {
       .find((id) => id)
 
     if (!firstId) {
-      setExploreStatus('No valid room scan IDs were found for this selection.', true)
+      openNoScansModal()
       return
     }
 
@@ -677,8 +669,8 @@ exploreBtn.addEventListener('click', async () => {
 
     window.location.href = `/viewer.html?${search.toString()}`
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to load room scans.'
-    setExploreStatus(message, true)
+    console.error(error)
+    openNoScansModal()
   } finally {
     isExploring = false
     renderSelectionState()
