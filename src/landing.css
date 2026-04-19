@@ -41,7 +41,6 @@ body {
 }
 
 #landing-page.upload-modal-open #map-container,
-#landing-page.upload-modal-open .panel-frame,
 #landing-page.upload-modal-open #header-icon {
   filter: blur(7px);
   transition: filter 220ms ease;
@@ -393,6 +392,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.no-scans-modal-card {
+  width: min(500px, calc(100% - 1.5rem));
+}
+
+.no-scans-modal-copy {
+  margin: 0;
+  color: rgba(194, 217, 255, 0.9);
+  font-size: 0.94rem;
+  line-height: 1.45;
 }
 
 .upload-progress {

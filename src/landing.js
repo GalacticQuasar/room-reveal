@@ -96,6 +96,18 @@ app.innerHTML = `
         <p id="upload-modal-status" class="explore-status" aria-live="polite"></p>
       </section>
     </div>
+
+    <div id="no-scans-modal" class="upload-modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="no-scans-modal-title">
+      <div id="no-scans-modal-backdrop" class="upload-modal-backdrop" aria-hidden="true"></div>
+      <section class="upload-modal-card no-scans-modal-card">
+        <header class="upload-modal-head">
+          <h2 id="no-scans-modal-title">No Room Scans Yet</h2>
+          <button id="close-no-scans-modal" class="upload-modal-close" type="button" aria-label="Close no scans modal"></button>
+        </header>
+        <p class="no-scans-modal-copy">No room scans are available yet for this selection.</p>
+        <button id="dismiss-no-scans-modal" class="cta-btn" type="button">Got it</button>
+      </section>
+    </div>
   </div>
 `
 
@@ -129,6 +141,10 @@ const uploadProgress = document.getElementById('upload-progress')
 const uploadProgressTrack = document.getElementById('upload-progress-track')
 const uploadProgressFill = document.getElementById('upload-progress-fill')
 const uploadProgressPercent = document.getElementById('upload-progress-percent')
+const noScansModal = document.getElementById('no-scans-modal')
+const noScansModalBackdrop = document.getElementById('no-scans-modal-backdrop')
+const closeNoScansModalBtn = document.getElementById('close-no-scans-modal')
+const dismissNoScansModalBtn = document.getElementById('dismiss-no-scans-modal')
 
 let isExploring = false
 let isUploading = false
@@ -144,6 +160,12 @@ function setExploreStatus(message, isError = false) {
 function setUploadStatus(message, isError = false) {
   uploadModalStatus.textContent = message
   uploadModalStatus.classList.toggle('error', isError)
+}
+
+function syncLandingModalState() {
+  const hasOpenModal =
+    !uploadModal.classList.contains('is-hidden') || !noScansModal.classList.contains('is-hidden')
+  landingPage.classList.toggle('upload-modal-open', hasOpenModal)
 }
 
 function updateSelectedFile(file) {
@@ -237,7 +259,7 @@ function openUploadModal() {
   setUploadStatus('')
   hideUploadProgress()
   uploadModal.classList.remove('is-hidden')
-  landingPage.classList.add('upload-modal-open')
+  syncLandingModalState()
 }
 
 function closeUploadModal() {
@@ -246,10 +268,20 @@ function closeUploadModal() {
   }
 
   uploadModal.classList.add('is-hidden')
-  landingPage.classList.remove('upload-modal-open')
   uploadForm.reset()
   setInputFile(null)
   hideUploadProgress()
+  syncLandingModalState()
+}
+
+function openNoScansModal() {
+  noScansModal.classList.remove('is-hidden')
+  syncLandingModalState()
+}
+
+function closeNoScansModal() {
+  noScansModal.classList.add('is-hidden')
+  syncLandingModalState()
 }
 
 async function getVideoDuration(file) {
@@ -483,8 +515,29 @@ uploadModalBackdrop.addEventListener('click', () => {
   closeUploadModal()
 })
 
+closeNoScansModalBtn.addEventListener('click', () => {
+  closeNoScansModal()
+})
+
+dismissNoScansModalBtn.addEventListener('click', () => {
+  closeNoScansModal()
+})
+
+noScansModalBackdrop.addEventListener('click', () => {
+  closeNoScansModal()
+})
+
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !uploadModal.classList.contains('is-hidden')) {
+  if (event.key !== 'Escape') {
+    return
+  }
+
+  if (!noScansModal.classList.contains('is-hidden')) {
+    closeNoScansModal()
+    return
+  }
+
+  if (!uploadModal.classList.contains('is-hidden')) {
     closeUploadModal()
   }
 })
@@ -601,7 +654,8 @@ exploreBtn.addEventListener('click', async () => {
   try {
     const splats = await fetchJson(`/splats/${encodeURIComponent(building)}/${encodeURIComponent(roomType)}`)
     if (!Array.isArray(splats) || splats.length === 0) {
-      setExploreStatus('No room scans are available yet for this selection.', true)
+      setExploreStatus('')
+      openNoScansModal()
       return
     }
 
