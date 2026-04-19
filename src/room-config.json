@@ -19,8 +19,8 @@
       "Single + shared bath & AC",
       "Single + private bath & AC"
     ],
-    "latitude": 40.4320142,
-    "longitude": -86.9179111
+    "latitude": 40.4318442,
+    "longitude": -86.9186811
   },
   "earhart": {
     "room-types": [
@@ -28,23 +28,23 @@
       "Standard Double + bath & AC",
       "Standard Double + AC"
     ],
-    "latitude": 40.4255,
-    "longitude": -86.9255
+    "latitude": 40.42574,
+    "longitude": -86.92566
   },
   "first-street-towers": {
     "room-types": [
       "Single + private bath & AC"
     ],
-    "latitude": 40.4249186,
-    "longitude": -86.9245489
+    "latitude": 40.4246986,
+    "longitude": -86.9252289
   },
   "frieda-parker": {
     "room-types": [
       "Suite semi + shared bath AC",
       "Suite + shared bath AC"
     ],
-    "latitude": 40.428,
-    "longitude": -86.92
+    "latitude": 40.42821,
+    "longitude": -86.9202
   },
   "winifred-parker": {
     "room-types": [
@@ -52,8 +52,8 @@
       "Suite semi + shared bath AC",
       "Suite + shared bath AC"
     ],
-    "latitude": 40.4283,
-    "longitude": -86.9195
+    "latitude": 40.4278,
+    "longitude": -86.9209
   },
   "harrison": {
     "room-types": [
@@ -63,8 +63,8 @@
       "Triple + bath & AC",
       "Standard Double + AC"
     ],
-    "latitude": 40.4248226,
-    "longitude": -86.9266029
+    "latitude": 40.4248926,
+    "longitude": -86.9274229
   },
   "hawkins": {
     "room-types": [
@@ -77,8 +77,8 @@
       "Single + shower & AC",
       "Single + shower bath & AC"
     ],
-    "latitude": 40.4239,
-    "longitude": -86.9225
+    "latitude": 40.42287,
+    "longitude": -86.91232
   },
   "hillenbrand": {
     "room-types": [
@@ -86,8 +86,8 @@
       "Double + shared bath & AC",
       "Single + shared bath & AC"
     ],
-    "latitude": 40.4268796,
-    "longitude": -86.9264344
+    "latitude": 40.4266496,
+    "longitude": -86.9274744
   },
   "honors-college": {
     "room-types": [
@@ -96,8 +96,8 @@
       "Double + AC",
       "Single + AC"
     ],
-    "latitude": 40.4275,
-    "longitude": -86.9185
+    "latitude": 40.42674,
+    "longitude": -86.9204
   },
   "mccutcheon": {
     "room-types": [
@@ -108,8 +108,8 @@
       "Standard Double + bath & AC",
       "Standard Double + AC"
     ],
-    "latitude": 40.4246695,
-    "longitude": -86.9280938
+    "latitude": 40.4249395,
+    "longitude": -86.9287038
   },
   "meredith": {
     "room-types": [
@@ -120,8 +120,8 @@
       "2 Room Suite for 2 + bath",
       "Standard Single"
     ],
-    "latitude": 40.4263027,
-    "longitude": -86.9232639
+    "latitude": 40.4262327,
+    "longitude": -86.9240339
   },
   "meredith-south": {
     "room-types": [
@@ -130,8 +130,8 @@
       "Single + AC",
       "Single + private bath & AC"
     ],
-    "latitude": 40.4259,
-    "longitude": -86.9238
+    "latitude": 40.42542,
+    "longitude": -86.9239
   },
   "owen": {
     "room-types": [
@@ -143,8 +143,8 @@
       "Single + AC",
       "Single + bath"
     ],
-    "latitude": 40.4322429,
-    "longitude": -86.9207113
+    "latitude": 40.4321729,
+    "longitude": -86.9213013
   },
   "shreve": {
     "room-types": [
@@ -152,8 +152,8 @@
       "Standard Double + bath & AC",
       "Standard Double + AC"
     ],
-    "latitude": 40.4269878,
-    "longitude": -86.9246771
+    "latitude": 40.4269078,
+    "longitude": -86.9257671
   },
   "tarkington": {
     "room-types": [
@@ -163,8 +163,8 @@
       "Triple + bath",
       "Single + bath"
     ],
-    "latitude": 40.43082,
-    "longitude": -86.920727
+    "latitude": 40.43051,
+    "longitude": -86.921467
   },
   "wiley": {
     "room-types": [
@@ -175,8 +175,8 @@
       "Single + bath",
       "Single + AC"
     ],
-    "latitude": 40.4294753,
-    "longitude": -86.9207055
+    "latitude": 40.4294153,
+    "longitude": -86.9213455
   },
   "windsor": {
     "room-types": [
@@ -194,7 +194,7 @@
       "Single + shared bath & AC",
       "Single + private bath & AC"
     ],
-    "latitude": 40.4267,
-    "longitude": -86.9226
+    "latitude": 40.4261,
+    "longitude": -86.92142
   }
 }
