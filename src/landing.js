@@ -40,6 +40,7 @@ const activeRoomConfig = getMergedRoomConfig()
 const app = document.querySelector('#app')
 app.innerHTML = `
   <div id="landing-page">
+    <img id="header-icon" src="/room-reveal-icon-transparent.png" alt="Room Reveal">
     <div id="map-container"></div>
     <div class="panel-frame">
       <aside class="left-panel" aria-label="Residence and room type selector">
