@@ -23,13 +23,14 @@ echo "Video duration: $DURATION seconds"
 
 # Step 1: Run COLMAP to extract camera poses and sparse point cloud from the video frames:
 echo "START: Extracting COLMAP data from video..."
-ns-process-data video --data $VIDEO_PATH --output-dir colmap/ --num-frames-target $((DURATION * 2))
+ns-process-data video --data $VIDEO_PATH --output-dir colmap/ --verbose --gpu --num-frames-target $((DURATION * 2))
 echo "END: COLMAP data extraction complete. Output saved to colmap/ directory."
 
 # Step 2: Train the Gaussian Splatting model with the extracted COLMAP data:
 echo "START: Training Gaussian Splatting model..."
 ns-train splatfacto --data colmap/ --max-num-iterations 5000 \
     --viewer.quit-on-train-completion True \
+    --machine.device-type cuda \
     --experiment-name my_splat \
     --timestamp latest
 echo "END: Training complete. Model config saved to outputs/my_splat/splatfacto/latest/config.yml"
