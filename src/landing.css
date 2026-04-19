@@ -587,6 +587,13 @@ body {
   line-height: 1.45;
 }
 
+.no-scans-modal-copy a,
+.no-scans-modal-copy a:visited,
+.no-scans-modal-copy a:hover,
+.no-scans-modal-copy a:active {
+  color: var(--accent);
+}
+
 .upload-progress {
   opacity: 0;
   max-height: 0;

@@ -6,6 +6,8 @@ import { apiUrl, fetchJson } from './api'
 const COORD_OVERRIDE_STORAGE_KEY = 'room-reveal.coordinate-overrides'
 const MAX_DURATION_SECONDS = 300
 const UPLOAD_FAKE_PROGRESS_DURATION_MS = 25_000
+const EXAMPLE_RESIDENCE_ID = 'frieda-parker'
+const EXAMPLE_ROOM_TYPE = '(Example) Study Room 1'
 
 function getMergedRoomConfig() {
   try {
@@ -148,7 +150,7 @@ app.innerHTML = `
           <h2 id="no-scans-modal-title">No Room Scans Yet</h2>
           <button id="close-no-scans-modal" class="upload-modal-close" type="button" aria-label="Close no scans modal"></button>
         </header>
-        <p class="no-scans-modal-copy">No room scans are available yet for this selection.</p>
+        <p class="no-scans-modal-copy">No room scans are available yet for this selection. You can view the <a id="no-scans-example-link" href="#">(Example) Study Room 1 in Frieda Parker</a> to check out an example scan in our system.</p>
         <button id="dismiss-no-scans-modal" class="cta-btn" type="button">Got it</button>
       </section>
     </div>
@@ -194,6 +196,7 @@ const noScansModal = document.getElementById('no-scans-modal')
 const noScansModalBackdrop = document.getElementById('no-scans-modal-backdrop')
 const closeNoScansModalBtn = document.getElementById('close-no-scans-modal')
 const dismissNoScansModalBtn = document.getElementById('dismiss-no-scans-modal')
+const noScansExampleLink = document.getElementById('no-scans-example-link')
 const headerIcon = document.getElementById('header-icon')
 const aboutModal = document.getElementById('about-modal')
 const aboutModalBackdrop = document.getElementById('about-modal-backdrop')
@@ -366,6 +369,36 @@ function toDisplayName(value) {
     .join(' ')
 }
 
+function flyToResidence(residenceId) {
+  const residence = activeRoomConfig[residenceId]
+  const hasCoords = Number.isFinite(residence?.latitude) && Number.isFinite(residence?.longitude)
+
+  if (!hasCoords) {
+    return
+  }
+
+  map.flyTo({
+    center: [residence.longitude, residence.latitude],
+    zoom: 17.4,
+    pitch: 55,
+    bearing: -25,
+    duration: 1700,
+    essential: true,
+  })
+}
+
+function selectResidenceAndRoom(residenceId, roomType = null) {
+  const roomTypes = activeRoomConfig[residenceId]?.['room-types'] || []
+
+  state.selectedResidenceId = residenceId
+  state.selectedRoomType = roomTypes.includes(roomType) ? roomType : null
+  state.isResidenceExpanded = false
+  state.isRoomTypeExpanded = false
+
+  flyToResidence(residenceId)
+  renderSelectionState()
+}
+
 function createPodButton(text, isSelected, onClick) {
   const button = document.createElement('button')
   button.type = 'button'
@@ -451,26 +484,7 @@ function renderResidencePods() {
           return
         }
 
-        state.selectedResidenceId = id
-        state.selectedRoomType = null
-        state.isResidenceExpanded = false
-        state.isRoomTypeExpanded = false
-
-        const residence = activeRoomConfig[id]
-        const hasCoords = Number.isFinite(residence?.latitude) && Number.isFinite(residence?.longitude)
-
-        if (hasCoords) {
-          map.flyTo({
-            center: [residence.longitude, residence.latitude],
-            zoom: 17.4,
-            pitch: 55,
-            bearing: -25,
-            duration: 1700,
-            essential: true,
-          })
-        }
-
-        renderSelectionState()
+        selectResidenceAndRoom(id)
       })
     )
   )
@@ -580,6 +594,12 @@ dismissNoScansModalBtn.addEventListener('click', () => {
 
 noScansModalBackdrop.addEventListener('click', () => {
   closeNoScansModal()
+})
+
+noScansExampleLink.addEventListener('click', (event) => {
+  event.preventDefault()
+  closeNoScansModal()
+  selectResidenceAndRoom(EXAMPLE_RESIDENCE_ID, EXAMPLE_ROOM_TYPE)
 })
 
 headerIcon.style.pointerEvents = 'auto'
