@@ -99,8 +99,14 @@ select {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
   color: var(--content);
+  color-scheme: dark;
   font-family: inherit;
   padding: 0.58rem 0.65rem;
+}
+
+select option {
+  background: #1a1a1a;
+  color: var(--content);
 }
 
 #viewBtn {
