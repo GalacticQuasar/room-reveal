@@ -212,7 +212,7 @@ async def upload_video(
     if not content_type.startswith("video/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be a video")
 
-    volume.reload()
+    await volume.reload.aio()
 
     job_id = str(uuid.uuid4())
     lock_path = _acquire_slot(job_id)
@@ -222,7 +222,7 @@ async def upload_video(
             detail="We are experiencing a high volume of requests at this time. Please try again later!",
         )
 
-    volume.commit()
+    await volume.commit.aio()
 
     uploads_dir = Path("/splats") / "_uploads"
     uploads_dir.mkdir(parents=True, exist_ok=True)
@@ -242,8 +242,8 @@ async def upload_video(
             _release_slot(lock_path)
             raise HTTPException(status_code=400, detail="Video must be 5 minutes or less")
 
-        volume.commit()
-        run_pipeline_job.spawn(job_id, building, room_type, str(upload_path), lock_path)
+        await volume.commit.aio()
+        run_pipeline_job.spawn.aio(job_id, building, room_type, str(upload_path), lock_path)
         return {
             "id": job_id,
             "message": "Thank you for your contribution to our platform! Your video is being processed, and will take some time (~15-30min depending on video duration) before being visible as a gaussian splat on the website. Check back later!",
@@ -251,7 +251,7 @@ async def upload_video(
     except Exception:
         upload_path.unlink(missing_ok=True)
         _release_slot(lock_path)
-        volume.commit()
+        await volume.commit.aio()
         raise
 
 
