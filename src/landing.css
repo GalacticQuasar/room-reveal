@@ -627,6 +627,44 @@ body {
   color: var(--content-muted);
 }
 
+.upload-instructions {
+  padding: 0.9rem 1rem;
+  background: rgba(69, 105, 144, 0.1);
+  border: 1px solid rgba(69, 105, 144, 0.25);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--content-muted);
+}
+
+.upload-instructions-list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.upload-instructions-list li {
+  margin-bottom: 0.5rem;
+}
+
+.upload-instructions-list li:last-child {
+  margin-bottom: 0;
+}
+
+.upload-instructions-tips-label {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--content);
+}
+
+.upload-instructions-tips-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.upload-instructions-tips-list li {
+  margin-bottom: 0.35rem;
+}
+
 .upload-dropzone {
   display: flex;
   align-items: center;
@@ -734,6 +772,10 @@ body {
   .upload-modal-card {
     width: calc(100% - 1rem);
     padding: 0.9rem;
+  }
+
+  .upload-instructions {
+    padding: 0.75rem 0.85rem;
   }
 
   .upload-dropzone {

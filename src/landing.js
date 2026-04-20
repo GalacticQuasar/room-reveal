@@ -119,6 +119,20 @@ app.innerHTML = `
           <h2 id="upload-modal-title">Upload Room Video</h2>
           <button id="close-upload-modal" class="upload-modal-close" type="button" aria-label="Close upload modal"></button>
         </header>
+        <div class="upload-instructions">
+          <ol class="upload-instructions-list">
+            <li>Orient your phone horizontally and use your 0.5x (ultrawide) lens if your phone has one. Set your FPS to at least 30fps and resolution to at least 1080p (Full HD).</li>
+            <li>Stand at a corner of the room, facing inwards with your phone. Slowly walk around the circumference of the room, keeping the phone angled inwards. You can do 2-3 passes (in one continuous video), one with the phone held high (and pointed downwards), one at eye-level, and one with the camera held low (pointed upwards).</li>
+            <li>Upload the video below!</li>
+          </ol>
+          <p class="upload-instructions-tips-label">TIPS:</p>
+          <ul class="upload-instructions-tips-list">
+            <li>Video length should be around 2-4 minutes, with a maximum of 5 minutes allowed.</li>
+            <li>Vary depth (move closer/farther on different passes) so objects are clearer!</li>
+            <li>Avoid sudden movements, and try to keep the camera steady and smooth. This will make for a higher-quality 3D model!</li>
+            <li>Try to keep objects in the frame at all times. Since our algorithm needs to find every image's position, we need markers to track in the video. Avoid capturing just a blank wall, for example.</li>
+          </ul>
+        </div>
         <form id="upload-modal-form" class="upload-modal-form" novalidate>
           <label id="upload-dropzone" class="upload-dropzone" for="upload-video-input">
             <input id="upload-video-input" type="file" accept="video/*" required>
