@@ -14,7 +14,7 @@ app.innerHTML = `
     <canvas id="viewport"></canvas>
     <button id="exitViewer" class="viewer-action exit-viewer-btn" type="button" aria-label="Exit viewer">Exit Viewer</button>
     <aside id="controlsPod" class="controls-pod is-hidden" aria-label="Viewer controls">
-      <p><strong>Move:</strong> WASD</p>
+      <p><strong>Move:</strong> WASD / Arrow Keys</p>
       <p><strong>Look:</strong> Mouse (click to lock)</p>
       <p><strong>Unlock:</strong> Esc</p>
       <p><strong>Switch:</strong> Arrow Left / Right</p>
@@ -353,10 +353,10 @@ function updateCameraMovement(deltaTime) {
   camera.getWorldDirection(lookForward)
   lookRight.crossVectors(lookForward, worldUp).normalize()
 
-  if (keyState.KeyW) moveDir.add(lookForward)
-  if (keyState.KeyS) moveDir.sub(lookForward)
-  if (keyState.KeyA) moveDir.sub(lookRight)
-  if (keyState.KeyD) moveDir.add(lookRight)
+  if (keyState.KeyW || keyState.ArrowUp) moveDir.add(lookForward)
+  if (keyState.KeyS || keyState.ArrowDown) moveDir.sub(lookForward)
+  if (keyState.KeyA || keyState.ArrowLeft) moveDir.sub(lookRight)
+  if (keyState.KeyD || keyState.ArrowRight) moveDir.add(lookRight)
   if (keyState.Space) moveDir.add(worldUp)
   if (keyState.KeyC) moveDir.sub(worldUp)
 
