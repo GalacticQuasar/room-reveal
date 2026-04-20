@@ -56,8 +56,8 @@ body {
   position: absolute;
   top: clamp(0.75rem, 1.5vw, 3rem);
   right: clamp(0.75rem, 1.5vw, 3rem);
-  width: clamp(4rem, 8vw, 5.5rem);
-  height: clamp(4rem, 8vw, 5.5rem);
+  width: clamp(5rem, 10vw, 7rem);
+  height: clamp(5rem, 10vw, 7rem);
   z-index: 3;
   pointer-events: none;
 }
