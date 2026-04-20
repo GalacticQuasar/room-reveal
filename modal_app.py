@@ -31,7 +31,11 @@ pipeline_image = (
     .add_local_file("pipeline/pipeline.sh", remote_path="/workspace/pipeline.sh")
 )
 
-web_image = modal.Image.debian_slim(python_version="3.11").pip_install("fastapi[standard]==0.115.6")
+web_image = (
+    modal.Image.debian_slim(python_version="3.11")
+    .apt_install("ffmpeg")
+    .pip_install("fastapi[standard]==0.115.6")
+)
 
 
 def _duration_seconds_from_file(video_path: Path) -> int:
@@ -45,7 +49,10 @@ def _duration_seconds_from_file(video_path: Path) -> int:
         "default=noprint_wrappers=1:nokey=1",
         str(video_path),
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError("ffprobe is not available in the web image") from exc
     seconds = int(float(proc.stdout.strip()))
     return max(seconds, 0)
 
