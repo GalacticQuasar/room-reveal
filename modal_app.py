@@ -14,7 +14,7 @@ from fastapi.responses import FileResponse
 
 
 MAX_VIDEO_DURATION_SECONDS = 300
-MAX_CONCURRENT_JOBS = 2
+MAX_CONCURRENT_JOBS = 20
 LOCK_STALE_AFTER_SECONDS = 60 * 60 * 6
 
 app = modal.App("room-reveal")
