@@ -15,9 +15,10 @@ app.innerHTML = `
     <button id="exitViewer" class="viewer-action exit-viewer-btn" type="button" aria-label="Exit viewer">Exit Viewer</button>
     <aside id="controlsPod" class="controls-pod is-hidden" aria-label="Viewer controls">
       <p><strong>Move:</strong> WASD / Arrow Keys</p>
+      <p><strong>Up / Down:</strong> Space / Shift</p>
       <p><strong>Look:</strong> Mouse (click to lock)</p>
       <p><strong>Unlock:</strong> Esc</p>
-      <p><strong>Switch:</strong> Arrow Left / Right</p>
+      <p><strong>Switch Rooms:</strong> Arrow Left / Right</p>
     </aside>
     <button id="recenterBtn" class="viewer-action recenter-btn is-hidden" type="button" aria-label="Re-center camera">
       Re-center
@@ -78,7 +79,6 @@ const clock = new THREE.Clock()
 
 const lookSensitivity = 0.0018
 const baseSpeed = 0.75
-const boostMultiplier = 2
 
 function applySplatOrientation(splat) {
   if (!splat) return
@@ -358,12 +358,11 @@ function updateCameraMovement(deltaTime) {
   if (keyState.KeyA || keyState.ArrowLeft) moveDir.sub(lookRight)
   if (keyState.KeyD || keyState.ArrowRight) moveDir.add(lookRight)
   if (keyState.Space) moveDir.add(worldUp)
-  if (keyState.KeyC) moveDir.sub(worldUp)
+  if (keyState.ShiftLeft || keyState.ShiftRight) moveDir.sub(worldUp)
 
   if (moveDir.lengthSq() > 0) {
     moveDir.normalize()
-    const speed = keyState.ShiftLeft || keyState.ShiftRight ? baseSpeed * boostMultiplier : baseSpeed
-    camera.position.addScaledVector(moveDir, speed * deltaTime)
+    camera.position.addScaledVector(moveDir, baseSpeed * deltaTime)
   }
 }
 
