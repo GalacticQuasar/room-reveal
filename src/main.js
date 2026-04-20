@@ -315,6 +315,11 @@ document.addEventListener('keydown', (event) => {
     return
   }
 
+  const isVerticalMoveKey = event.code === 'Space' || event.code === 'ShiftLeft' || event.code === 'ShiftRight'
+  if (isVerticalMoveKey && document.pointerLockElement !== canvas) {
+    return
+  }
+
   keyState[event.code] = true
 })
 
@@ -327,6 +332,11 @@ canvas.addEventListener('click', () => {
 })
 
 document.addEventListener('pointerlockchange', () => {
+  if (document.pointerLockElement !== canvas) {
+    keyState.Space = false
+    keyState.ShiftLeft = false
+    keyState.ShiftRight = false
+  }
   updateArrowState()
 })
 
@@ -350,6 +360,7 @@ document.addEventListener('mousemove', (event) => {
 
 function updateCameraMovement(deltaTime) {
   moveDir.set(0, 0, 0)
+  const isLookModeActive = document.pointerLockElement === canvas
   camera.getWorldDirection(lookForward)
   lookRight.crossVectors(lookForward, worldUp).normalize()
 
@@ -357,8 +368,8 @@ function updateCameraMovement(deltaTime) {
   if (keyState.KeyS || keyState.ArrowDown) moveDir.sub(lookForward)
   if (keyState.KeyA || keyState.ArrowLeft) moveDir.sub(lookRight)
   if (keyState.KeyD || keyState.ArrowRight) moveDir.add(lookRight)
-  if (keyState.Space) moveDir.add(worldUp)
-  if (keyState.ShiftLeft || keyState.ShiftRight) moveDir.sub(worldUp)
+  if (isLookModeActive && keyState.Space) moveDir.add(worldUp)
+  if (isLookModeActive && (keyState.ShiftLeft || keyState.ShiftRight)) moveDir.sub(worldUp)
 
   if (moveDir.lengthSq() > 0) {
     moveDir.normalize()
