@@ -94,13 +94,12 @@ To run/deploy backend, use Modal CLI against `modal_app.py` (for example, `modal
 
 ## Viewer controls
 
-- `W A S D`: move
+- `W A S D` or `Arrow Keys`: move
 - `Space`: move up
-- `C`: move down
-- `Shift`: speed boost
+- `Shift`: move down
 - `Mouse`: look around (click canvas to lock pointer)
 - `Esc`: release pointer lock
-- `Arrow Left` / `Arrow Right`: switch between scans for the selected room
+- `Arrow Left` / `Arrow Right`: switch rooms (when pointer is not locked)
 - `Re-center` button: reset camera to origin
 
 ## Pipeline
