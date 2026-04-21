@@ -576,8 +576,8 @@ function renderSelectionState() {
 const map = new maplibregl.Map({
   container: 'map-container',
   style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-  center: [-86.9196215, 40.4284539],
-  zoom: 17,
+  center: [-86.92137, 40.42356],
+  zoom: 15,
   pitch: 55,
   bearing: -25,
 })
